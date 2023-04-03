@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "203038191370",
+    "project_id": "passvault-c5fdc",
+    "storage_bucket": "passvault-c5fdc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203038191370:android:500d4358752cff48b014f3",
+        "android_client_info": {
+          "package_name": "com.example.passwordmanager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "203038191370-an7r6nolmui32jk40rf1kmnvmet37nef.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzGwaBb2gQfAhmPKD_gX_tfeCK0vruu3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "203038191370-an7r6nolmui32jk40rf1kmnvmet37nef.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

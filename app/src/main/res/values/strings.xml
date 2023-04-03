@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">PassVault</string>
+    <string name="login_button">Log in</string>
+    <string name="logo">Logo</string>
+    <string name="email">Enter email address</string>
+    <string name="password">Enter password</string>
+    <string name="new_acc_text">Not using yet?</string>
+    <string name="new_acc_link">Create an account</string>
+    <string name="pass_forgot">Forgot your password?</string>
+    <string name="forgot_password">Forgot password</string>
+    <string name="register">Let\'s get started</string>
+    <string name="log_in">Log in</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="continue_reg">Continue</string>
+    <string name="create_your_password">Create your password</string>
+    <string name="pass_hints">Come up with something unique, memorable and difficult to guess.</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="pass_hint">Password hint (optional)</string>
+    <string name="use_biometrics_as_a_key">Use biometrics as a key</string>
+    <string name="turn_on_touch_id_and_feel_the_power_of_your_fingerprint">Turn on Touch ID and feel the power of your fingerprint.</string>
+    <string name="unlock_your_vault_in_a_second">Unlock your vault in a second</string>
+    <string name="recover_your_account_if_you_forget_your_master_password">Recover your account if you forget your master password</string>
+    <string name="turn_on_biometrics">TURN ON BIOMETRICS</string>
+    <string name="do_it_later">I\'LL DO IT LATER</string>
+    <string name="your_data_will_be_accessible_with_any_biometric_profile_registered_on_this_device">Your data will be accessible with any biometric profile registered on this device</string>
+    <string name="recover_account">RECOVER ACCOUNT</string>
+    <string name="or_send_hint">OR SEND HINT</string>
+    <string name="pass_forgot_hint">You can recover your account by tapping on the button below. Alternatively, if you created a password hint \nearlier, we\'ll email it to you.</string>
+    <string name="terms">By completing this form, you agree to the following terms and conditions:</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="log_with_fingerprint">Log with fingerprint</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+</resources>
