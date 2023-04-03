@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:divider="@color/main"
+    android:dividerHeight="1dp"
+    tools:showIn="navigation_view">
+
+    <group
+        android:id="@+id/menu_top"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_all"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/all_items" />
+        <item
+            android:id="@+id/nav_passwords"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/passwords" />
+        <item
+            android:id="@+id/nav_payment_card"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/payment_cards" />
+    </group>
+    <group
+        android:id="@+id/menu_center"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_generate_password"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/generate_password" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/about" />
+    </group>
+</menu>

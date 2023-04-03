@@ -20,6 +20,7 @@
         <item name="colorPrimaryVariant">@color/main</item>
         <item name="colorOnPrimary">@color/main</item>
         <item name="android:windowBackground">@color/background</item>
+        <item name="android:listDivider">@color/main</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/main</item>
         <item name="colorSecondaryVariant">@color/main</item>
