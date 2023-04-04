@@ -11,6 +11,7 @@
         <item name="colorOnSecondary">@color/main</item>
         <item name="android:statusBarColor">@color/main</item>
         <item name="android:textColorPrimary">@color/background</item>
+        <item name="android:listDivider">@color/main</item>
         <!-- Status bar color. -->
     </style>
 
@@ -20,11 +21,11 @@
         <item name="colorPrimaryVariant">@color/main</item>
         <item name="colorOnPrimary">@color/main</item>
         <item name="android:windowBackground">@color/background</item>
-        <item name="android:listDivider">@color/main</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/main</item>
         <item name="colorSecondaryVariant">@color/main</item>
         <item name="colorOnSecondary">@color/main</item>
+        <item name="android:listDivider">@color/main</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/main</item>
     </style>
@@ -55,9 +56,5 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-
-    <style name="Theme.PasswordManager.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="Theme.PasswordManager.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

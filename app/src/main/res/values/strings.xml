@@ -27,11 +27,11 @@
     <string name="or_send_hint">OR SEND HINT</string>
     <string name="pass_forgot_hint">You can recover your account by tapping on the button below. Alternatively, if you created a password hint \nearlier, we\'ll email it to you.</string>
     <string name="terms">By completing this form, you agree to the following terms and conditions:</string>
+    <string name="log_with_fingerprint">Login with fingerprint</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
-    <string name="log_with_fingerprint">Login with fingerprint</string>
     <string name="all_items">All items</string>
     <string name="passwords">Passwords</string>
     <string name="payment_cards">Payment cards</string>
