@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 
 import java.util.Objects;
 
@@ -98,7 +99,6 @@ public class LoginActivity extends AppCompatActivity {
                         .addOnCompleteListener(this, task -> {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = mAuth.getCurrentUser();
-
                                 assert user != null;
                                 db.collection("users").document(user.getUid())
                                         .get()
@@ -108,6 +108,7 @@ public class LoginActivity extends AppCompatActivity {
                                                 if (document.exists()) {
                                                     sph.saveStringValue("lastLoginUserID", user.getUid());
                                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                                    intent.putExtra("user", user);
                                                     startActivity(intent);
                                                     finish();
                                                 }
@@ -174,6 +175,7 @@ public class LoginActivity extends AppCompatActivity {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                intent.putExtra("user", user);
                                 startActivity(intent);
                                 finish();
                             } else {

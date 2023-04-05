@@ -24,7 +24,7 @@ public class GeneratePassFragment extends Fragment {
         binding = FragmentGeneratePassBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textSlideshow;
+        final TextView textView = binding.textGeneratePass;
         generatePassViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }

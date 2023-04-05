@@ -24,7 +24,7 @@ public class PasswordsFragment extends Fragment {
         binding = FragmentPasswordsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textHome;
+        final TextView textView = binding.textPasswords;
         passwordsViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }

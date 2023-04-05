@@ -24,7 +24,7 @@ public class PaymentCardFragment extends Fragment {
         binding = FragmentPaymentCardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textSlideshow;
+        final TextView textView = binding.textPaymentCard;
         paymentCardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }

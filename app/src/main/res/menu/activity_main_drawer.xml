@@ -11,6 +11,10 @@
             android:id="@+id/nav_all"
             android:icon="@drawable/ic_menu_allitems"
             android:title="@string/all_items" />
+    </group>
+    <group
+        android:id="@+id/menu_info"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_passwords"
             android:icon="@drawable/ic_menu_password"
@@ -21,12 +25,16 @@
             android:title="@string/payment_cards" />
     </group>
     <group
-        android:id="@+id/menu_center"
+        android:id="@+id/menu_generate"
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_generate_password"
             android:icon="@drawable/ic_menu_generate_pass"
             android:title="@string/generate_password" />
+    </group>
+    <group
+        android:id="@+id/menu_about"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_menu_about"

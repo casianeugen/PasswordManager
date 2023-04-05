@@ -30,6 +30,7 @@
             android:layout_gravity="bottom"
             android:orientation="vertical"
             android:paddingStart="11dp"
+            android:background="@drawable/custom_border"
             android:paddingEnd="20dp">
 
             <com.google.android.material.button.MaterialButton
