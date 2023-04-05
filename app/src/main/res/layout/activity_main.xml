@@ -42,7 +42,7 @@
                 android:textAllCaps="false"
                 android:textStyle="bold"
                 android:gravity="start|center"
-                app:drawableLeftCompat="@drawable/ic_menu_slideshow"
+                app:drawableLeftCompat="@drawable/ic_menu_settings"
                 android:textColor="@color/black" />
         </LinearLayout>
     </com.google.android.material.navigation.NavigationView>
