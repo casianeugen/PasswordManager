@@ -7,30 +7,30 @@
 
     <fragment
         android:id="@+id/nav_all"
-        android:name="com.example.passwordmanager.ui.allList.ListFragment"
+        android:name="com.example.passwordmanager.ListFragment"
         android:label="All List"
         tools:layout="@layout/fragment_all_list" />
 
     <fragment
         android:id="@+id/nav_passwords"
-        android:name="com.example.passwordmanager.ui.passwords.PasswordsFragment"
+        android:name="com.example.passwordmanager.PasswordsFragment"
         android:label="Passwords"
         tools:layout="@layout/fragment_passwords" />
 
     <fragment
         android:id="@+id/nav_payment_card"
-        android:name="com.example.passwordmanager.ui.payment_card.PaymentCardFragment"
+        android:name="com.example.passwordmanager.PaymentCardFragment"
         android:label="Payment Cards"
         tools:layout="@layout/fragment_payment_card" />
 
-    <fragment
+    <dialog
         android:id="@+id/nav_generate_password"
-        android:name="com.example.passwordmanager.ui.generate_pass.GeneratePassFragment"
+        android:name="com.example.passwordmanager.GeneratePassFragment"
         android:label="Generate Password"
         tools:layout="@layout/fragment_generate_pass" />
-    <fragment
+    <dialog
         android:id="@+id/nav_about"
-        android:name="com.example.passwordmanager.ui.about.AboutFragment"
-        android:label="About"
+        android:name="com.example.passwordmanager.AboutFragment"
+        android:label="Generate Password"
         tools:layout="@layout/fragment_about" />
 </navigation>

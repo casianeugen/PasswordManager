@@ -52,6 +52,10 @@
         <item name="android:indeterminateBehavior">repeat</item>
     </style>
 
+    <style name="menuIcon" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:textColorPrimary">@color/white</item>
+    </style>
+
     <style name="Theme.PasswordManager.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

@@ -1,4 +1,4 @@
-package com.example.passwordmanager.ui.allList;
+package com.example.passwordmanager;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,28 +10,20 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.passwordmanager.R;
 import com.example.passwordmanager.databinding.FragmentAllListBinding;
 
 public class ListFragment extends Fragment {
 
-    private FragmentAllListBinding binding;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        ListViewModel listViewModel =
-                new ViewModelProvider(this).get(ListViewModel.class);
 
-        binding = FragmentAllListBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        final TextView textView = binding.textAllList;
-        listViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        View root = inflater.inflate(R.layout.fragment_all_list, container, false);
         return root;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
     }
 }
