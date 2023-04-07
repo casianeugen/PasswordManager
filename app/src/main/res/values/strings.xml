@@ -45,4 +45,9 @@
     <string name="ok">OK</string>
     <string name="search">Search</string>
     <string name="add_button">Add button</string>
+    <string name="use">USE</string>
+    <string name="cancel">CANCEL</string>
+    <string name="refresh_pass">Refresh Pass</string>
+    <string name="copy_password">Copy Password</string>
+    <string name="password_length">Password length:</string>
 </resources>
