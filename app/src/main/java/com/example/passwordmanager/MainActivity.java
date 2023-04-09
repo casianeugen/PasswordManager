@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     FloatingActionButton fab;
     Toolbar toolbar;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.nav_view);
         headerView = navigationView.getHeaderView(0);
         profile_email = headerView.findViewById(R.id.profile_email);
+
+        Button nav_settings = findViewById(R.id.nav_settings);
 
         setSupportActionBar(toolbar);
 
@@ -66,6 +71,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        nav_settings.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override
@@ -120,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void addItemToList() {
-
+        Intent intent = new Intent(MainActivity.this, AddMenuActivity.class);
+        startActivity(intent);
     }
 }

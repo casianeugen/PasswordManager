@@ -28,6 +28,7 @@
         android:name="com.example.passwordmanager.GeneratePassFragment"
         android:label="Generate Password"
         tools:layout="@layout/fragment_generate_pass" />
+
     <dialog
         android:id="@+id/nav_about"
         android:name="com.example.passwordmanager.AboutFragment"

@@ -17,10 +17,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.auth.User;
 
 import java.util.Objects;
 
@@ -30,7 +27,6 @@ public class LoginActivity extends AppCompatActivity {
     TextInputEditText login_pass;
     LinearLayout bio;
     SharedPreferencesHelper sph;
-    private FirebaseFirestore db;
     private TextInputLayout emailError;
     private TextInputLayout passError;
 
@@ -58,8 +54,6 @@ public class LoginActivity extends AppCompatActivity {
         login_mail = findViewById(R.id.log_email);
         login_pass = findViewById(R.id.log_pass);
 
-        db = FirebaseFirestore.getInstance();
-
         login_mail.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
                 emailError.setErrorEnabled(false);
@@ -73,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         bio.setVisibility(View.GONE);
-        login_mail.addTextChangedListener(new BioLogin(bio, login_mail, sph.getStringValue("lastLoginUserID")));
+        login_mail.addTextChangedListener(new BioLogin(bio, login_mail, lastLoggedInUserId));
         bio.setOnClickListener(v -> showBiometricPrompt());
 
         reg_link.setOnClickListener(v -> {
@@ -87,7 +81,6 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
         });
-
         button_log_in.setOnClickListener(v -> {
             try {
                 login_mail = findViewById(R.id.log_email);
@@ -98,22 +91,11 @@ public class LoginActivity extends AppCompatActivity {
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(this, task -> {
                             if (task.isSuccessful()) {
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                assert user != null;
-                                db.collection("users").document(user.getUid())
-                                        .get()
-                                        .addOnCompleteListener(task1 -> {
-                                            if (task1.isSuccessful()) {
-                                                DocumentSnapshot document = task1.getResult();
-                                                if (document.exists()) {
-                                                    sph.saveStringValue("lastLoginUserID", user.getUid());
-                                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                                    intent.putExtra("user", user);
-                                                    startActivity(intent);
-                                                    finish();
-                                                }
-                                            }
-                                        });
+                                sph.saveStringValue("lastLoginUserID", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                intent.putExtra("user", mAuth.getCurrentUser());
+                                startActivity(intent);
+                                finish();
                             } else {
                                 emailError.setErrorEnabled(true);
                                 emailError.setError("Check your email address and try again");
@@ -167,26 +149,12 @@ public class LoginActivity extends AppCompatActivity {
     private void loginWithBiometrics() {
         String userId = sph.getStringValue("lastLoginUserID");
         if (userId != null) {
-            db.collection("users").document(userId)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                intent.putExtra("user", user);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                // Handle the case when the user's document is not found
-                                Log.d("User Document:", "User's document is not found");
-                            }
-                        } else {
-                            // Handle the error when fetching the user's document
-                            Log.d("User Document:", "Error when fetching the user's document");
-                        }
-                    });
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.putExtra("user", userId);
+            startActivity(intent);
+            finish();
+            // Handle the case when the user's document is not found
+            Log.d("User Document:", "User's document is not found");
         } else {
             // Handle the case when the user ID is not found in SharedPreferences
             Log.d("SharedPreferences:", "ID is not found in SharedPreferences");

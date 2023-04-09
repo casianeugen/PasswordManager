@@ -39,7 +39,8 @@ public class BioLogin implements TextWatcher {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists() &&
                                     Objects.equals(document.getBoolean("biometricEnrolled"), true)
-                                    && Objects.equals(document.getString("email"), Objects.requireNonNull(log_email.getText()).toString().trim())) {
+                                    && Objects.equals(document.getString("email"),
+                                    Objects.requireNonNull(log_email.getText()).toString().trim())) {
                                 bio.setVisibility(View.VISIBLE);
                             } else {
                                 // User doesn't exist in the database, hide the button

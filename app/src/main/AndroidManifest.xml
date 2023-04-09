@@ -41,7 +41,18 @@
             android:theme="@style/Theme.PasswordManager.Light" />
         <activity android:name=".RegisterActivityPass" />
         <activity android:name=".BiometricActivity" />
-        <activity android:name=".PassRestoreActivity" />
+        <activity android:name=".AddMenuActivity"
+            android:label="Add Item"
+            android:theme="@style/Theme.PasswordManager.Light"/>
+        <activity android:name=".AddPasswordActivity"
+            android:label="Add password"
+            android:theme="@style/Theme.PasswordManager.Light"/>
+        <activity android:name=".AddPaymentCardActivity"
+            android:label="Add payment card"
+            android:theme="@style/Theme.PasswordManager.Light"/>
+        <activity android:name=".SettingsActivity"
+            android:label="Settings"
+            android:theme="@style/Theme.PasswordManager.Light"/>
     </application>
 
 </manifest>

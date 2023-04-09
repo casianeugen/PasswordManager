@@ -4,11 +4,15 @@ import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,9 +21,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.security.SecureRandom;
-import java.util.Random;
 
 public class GeneratePassFragment extends DialogFragment {
     private static final String PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
@@ -28,7 +33,6 @@ public class GeneratePassFragment extends DialogFragment {
     private TextView count_pass_length;
     private SeekBar seek_bar_password;
     @NonNull
-    @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
@@ -42,6 +46,25 @@ public class GeneratePassFragment extends DialogFragment {
         generated_pass = view.findViewById(R.id.generated_pass);
         count_pass_length = view.findViewById(R.id.count_length);
         seek_bar_password = view.findViewById(R.id.seek_bar_password);
+
+        RadioButton radioButton1 = view.findViewById(R.id.first);
+        RadioButton radioButton2 = view.findViewById(R.id.second);
+        RadioButton radioButton3 = view.findViewById(R.id.third);
+
+        SpannableString s1 = new SpannableString(radioButton1.getText().toString());
+        SpannableString s2 = new SpannableString(radioButton2.getText().toString());
+        SpannableString s3 = new SpannableString(radioButton3.getText().toString());
+
+        s1.setSpan(new ForegroundColorSpan(Color.GRAY), 20, s1.length(), 0);
+        s1.setSpan(new RelativeSizeSpan(0.8f), 20, s1.length(), 0);
+        s2.setSpan(new ForegroundColorSpan(Color.GRAY), 12, s2.length(), 0);
+        s2.setSpan(new RelativeSizeSpan(0.8f), 12, s2.length(), 0);
+        s3.setSpan(new ForegroundColorSpan(Color.GRAY), 11, s3.length(), 0);
+        s3.setSpan(new RelativeSizeSpan(0.8f), 11, s3.length(), 0);
+
+        radioButton1.setText(s1);
+        radioButton2.setText(s2);
+        radioButton3.setText(s3);
 
         count_pass_length.setText(String.valueOf(seek_bar_password.getProgress()));
         generated_pass.setText(generatePassword(seek_bar_password.getProgress()));
@@ -79,8 +102,7 @@ public class GeneratePassFragment extends DialogFragment {
         cancel.setOnClickListener(v -> dismiss());
 
         use.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), RegisterActivity.class);
-            startActivity(intent);
+
         });
 
         return builder.create();

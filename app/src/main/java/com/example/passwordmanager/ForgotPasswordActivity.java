@@ -49,7 +49,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                         } else {
                             boolean check = !Objects.requireNonNull(task.getResult().getSignInMethods()).isEmpty();
                             if (check) {
-                                Intent intent = new Intent(ForgotPasswordActivity.this, PassRestoreActivity.class);
+                                Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
                                 intent.putExtra("email", email.getText().toString());
                                 startActivity(intent);
                             } else {

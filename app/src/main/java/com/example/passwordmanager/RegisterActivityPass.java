@@ -110,11 +110,8 @@ public class RegisterActivityPass extends AppCompatActivity {
                             .addOnCompleteListener(this, task -> {
                                 if (task.isSuccessful()) {
                                     FirebaseUser user = mAuth.getCurrentUser();
-
                                     Map<String, Object> userMap = new HashMap<>();
-                                    userMap.put("email", email);
                                     userMap.put("password_hint", hint);
-
                                     assert user != null;
                                     db1.collection("users").document(user.getUid())
                                             .set(userMap)
@@ -125,7 +122,6 @@ public class RegisterActivityPass extends AppCompatActivity {
                                                 finish();
                                             })
                                             .addOnFailureListener(e -> Toast.makeText(this, "Error adding user", Toast.LENGTH_SHORT).show());
-
                                 }
                             });
                 }
