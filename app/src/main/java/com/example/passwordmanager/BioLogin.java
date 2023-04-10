@@ -2,11 +2,18 @@ package com.example.passwordmanager;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -31,25 +38,24 @@ public class BioLogin implements TextWatcher {
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference collectionRef = db.collection("users");
         if (userID != null) {
-            db.collection("users").document(userID)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists() &&
-                                    Objects.equals(document.getBoolean("biometricEnrolled"), true)
-                                    && Objects.equals(document.getString("email"),
-                                    Objects.requireNonNull(log_email.getText()).toString().trim())) {
-                                bio.setVisibility(View.VISIBLE);
-                            } else {
-                                // User doesn't exist in the database, hide the button
-                                bio.setVisibility(View.GONE);
-                            }
+            DocumentReference docRef = collectionRef.document(userID);
+            docRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()){
+                    DocumentSnapshot document = task.getResult();
+                    if(document.exists()){
+                        Boolean value = document.getBoolean("biometricEnrolled");
+                        System.out.println(value);
+                        if (Objects.equals(value, true)) {
+                            bio.setVisibility(View.VISIBLE);
                         } else {
-                            Log.d("User Document:", "Error when fetching the user's document");
+                            // User doesn't exist in the database, hide the button
+                            bio.setVisibility(View.GONE);
                         }
-                    });
+                    }
+                }
+            });
         } else {
             // Handle the case when the user ID is not found in SharedPreferences
             bio.setVisibility(View.GONE);
