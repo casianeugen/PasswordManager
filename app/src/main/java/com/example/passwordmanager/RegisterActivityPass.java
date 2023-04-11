@@ -20,6 +20,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -117,7 +118,6 @@ public class RegisterActivityPass extends AppCompatActivity {
                                             .set(userMap)
                                             .addOnSuccessListener(aVoid -> {
                                                 Intent intent = new Intent(RegisterActivityPass.this, BiometricActivity.class);
-                                                intent.putExtra("user", user);
                                                 startActivity(intent);
                                                 finish();
                                             })

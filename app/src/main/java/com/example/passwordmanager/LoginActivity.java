@@ -17,6 +17,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
@@ -40,6 +41,9 @@ public class LoginActivity extends AppCompatActivity {
         MaterialButton button_log_in = findViewById(R.id.button_log_in);
 
         String lastLoggedInUserId = sph.getStringValue("lastLoginUserID");
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db1 = FirebaseFirestore.getInstance();
 
 //        if(lastLoggedInUserId != null){
 //            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -93,7 +97,6 @@ public class LoginActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 sph.saveStringValue("lastLoginUserID", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                intent.putExtra("user", mAuth.getCurrentUser());
                                 startActivity(intent);
                                 finish();
                             } else {
@@ -150,7 +153,6 @@ public class LoginActivity extends AppCompatActivity {
         String userId = sph.getStringValue("lastLoginUserID");
         if (userId != null) {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.putExtra("user", userId);
             startActivity(intent);
             finish();
             // Handle the case when the user's document is not found

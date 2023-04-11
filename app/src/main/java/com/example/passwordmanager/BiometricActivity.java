@@ -13,15 +13,18 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class BiometricActivity extends AppCompatActivity {
     private FirebaseFirestore db;
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private String userId;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,12 +36,8 @@ public class BiometricActivity extends AppCompatActivity {
 
         bioLater.setOnClickListener(v -> {
             db = FirebaseFirestore.getInstance();
-            Intent i = getIntent();
-            FirebaseUser user = i.getParcelableExtra("user");
-            userId = user.getUid().trim();
-            updateBiometricEnrollmentFlag(userId, false);
+            updateBiometricEnrollmentFlag(Objects.requireNonNull(mAuth.getCurrentUser()).getUid(), false);
             Intent intent = new Intent(BiometricActivity.this, LoginActivity.class);
-            intent.putExtra("user", user);
             startActivity(intent);
             finish();
         });
@@ -67,9 +66,7 @@ public class BiometricActivity extends AppCompatActivity {
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
                 Intent i = getIntent();
-                FirebaseUser user = i.getParcelableExtra("user");
-                userId = user.getUid().trim();
-                updateBiometricEnrollmentFlag(userId, true);
+                updateBiometricEnrollmentFlag(Objects.requireNonNull(mAuth.getCurrentUser()).getUid(), true);
                 Intent intent = new Intent(BiometricActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();

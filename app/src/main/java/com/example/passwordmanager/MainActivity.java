@@ -22,11 +22,15 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private AppBarConfiguration mAppBarConfiguration;
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     DrawerLayout drawer;
     NavigationView navigationView;
     View headerView;
@@ -42,10 +46,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseUser user;
-        Intent i = getIntent();
-        user = i.getParcelableExtra("user");
-
         fab = findViewById(R.id.fab);
         toolbar = findViewById(R.id.toolbar);
         drawer = findViewById(R.id.drawer_layout);
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        profile_email.setText(user.getEmail());
+        profile_email.setText(Objects.requireNonNull(mAuth.getCurrentUser()).getEmail());
 
         fab.setOnClickListener(view -> addItemToList());
 

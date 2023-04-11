@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -231,7 +232,9 @@ public class GeneratePassFragment extends DialogFragment {
         cancel.setOnClickListener(v -> dismiss());
 
         use.setOnClickListener(v -> {
-
+            Intent intent = new Intent(requireActivity(), AddPasswordActivity.class);
+            intent.putExtra("password", generated_pass.getText().toString());
+            startActivity(intent);
         });
 
         return builder.create();
