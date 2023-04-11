@@ -47,6 +47,7 @@ public class GeneratePassFragment extends DialogFragment {
         count_pass_length = view.findViewById(R.id.count_length);
         seek_bar_password = view.findViewById(R.id.seek_bar_password);
 
+        RadioGroup types = view.findViewById(R.id.types);
         RadioButton radioButton1 = view.findViewById(R.id.first);
         RadioButton radioButton2 = view.findViewById(R.id.second);
         RadioButton radioButton3 = view.findViewById(R.id.third);
@@ -120,77 +121,86 @@ public class GeneratePassFragment extends DialogFragment {
             }
         });
 
-        if (radioButton1.isChecked()) {
-            symbol.setEnabled(true);
-            number.setEnabled(true);
-            lower.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                symbol.setEnabled(upper.isChecked() || number.isChecked() || lower.isChecked());
-                upper.setEnabled(symbol.isChecked() || number.isChecked() || lower.isChecked());
-                number.setEnabled(upper.isChecked() || symbol.isChecked() || lower.isChecked());
-            });
-            upper.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                symbol.setEnabled(lower.isChecked() || number.isChecked() || upper.isChecked());
-                number.setEnabled(lower.isChecked() || symbol.isChecked() || upper.isChecked());
-                lower.setEnabled(symbol.isChecked() || number.isChecked() || upper.isChecked());
-            });
-            number.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                symbol.setEnabled(upper.isChecked() || lower.isChecked() || number.isChecked());
-                lower.setEnabled(upper.isChecked() || symbol.isChecked() || number.isChecked());
-                upper.setEnabled(symbol.isChecked() || lower.isChecked() || number.isChecked());
-            });
-            symbol.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                lower.setEnabled(upper.isChecked() || number.isChecked() || symbol.isChecked());
-                number.setEnabled(upper.isChecked() || lower.isChecked() || symbol.isChecked());
-                upper.setEnabled(lower.isChecked() || number.isChecked() || symbol.isChecked());
-            });
-            generated_pass.setText(generatePassword
-                    .seekBarGenerate(seek_bar_password.getProgress(),
-                            lower.isChecked(),
-                            upper.isChecked(),
-                            number.isChecked(),
-                            symbol.isChecked()));
-        }
-        if (radioButton2.isChecked()) {
-            symbol.setEnabled(false);
-            symbol.setChecked(false);
-            number.setEnabled(true);
-            lower.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                upper.setEnabled(symbol.isChecked() || number.isChecked() || lower.isChecked());
-                number.setEnabled(upper.isChecked() || symbol.isChecked() || lower.isChecked());
+        types.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (radioButton1.isChecked()) {
+                symbol.setEnabled(true);
+                number.setEnabled(true);
+                lower.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    symbol.setEnabled(upper.isChecked() || number.isChecked() || lower.isChecked());
+                    upper.setEnabled(symbol.isChecked() || number.isChecked() || lower.isChecked());
+                    number.setEnabled(upper.isChecked() || symbol.isChecked() || lower.isChecked());
+                });
+                upper.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    symbol.setEnabled(lower.isChecked() || number.isChecked() || upper.isChecked());
+                    number.setEnabled(lower.isChecked() || symbol.isChecked() || upper.isChecked());
+                    lower.setEnabled(symbol.isChecked() || number.isChecked() || upper.isChecked());
+                });
+                number.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    symbol.setEnabled(upper.isChecked() || lower.isChecked() || number.isChecked());
+                    lower.setEnabled(upper.isChecked() || symbol.isChecked() || number.isChecked());
+                    upper.setEnabled(symbol.isChecked() || lower.isChecked() || number.isChecked());
+                });
+                symbol.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    lower.setEnabled(upper.isChecked() || number.isChecked() || symbol.isChecked());
+                    number.setEnabled(upper.isChecked() || lower.isChecked() || symbol.isChecked());
+                    upper.setEnabled(lower.isChecked() || number.isChecked() || symbol.isChecked());
+                });
+                generated_pass.setText(generatePassword
+                        .seekBarGenerate(seek_bar_password.getProgress(),
+                                lower.isChecked(),
+                                upper.isChecked(),
+                                number.isChecked(),
+                                symbol.isChecked()));
+            }
+            if (radioButton2.isChecked()) {
+                symbol.setEnabled(false);
+                symbol.setChecked(false);
+                number.setEnabled(true);
+                lower.setChecked(true);
+                if(!upper.isChecked() && !number.isChecked())
+                    lower.setEnabled(false);
+                lower.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    upper.setEnabled(symbol.isChecked() || number.isChecked() || lower.isChecked());
+                    number.setEnabled(upper.isChecked() || symbol.isChecked() || lower.isChecked());
 
-            });
-            upper.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                lower.setEnabled(symbol.isChecked() || number.isChecked() || upper.isChecked());
-                number.setEnabled(symbol.isChecked() || lower.isChecked() || upper.isChecked());
+                });
+                upper.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    lower.setEnabled(symbol.isChecked() || number.isChecked() || upper.isChecked());
+                    number.setEnabled(symbol.isChecked() || lower.isChecked() || upper.isChecked());
 
-            });
-            number.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                lower.setEnabled(upper.isChecked() || symbol.isChecked() || number.isChecked());
-                upper.setEnabled(symbol.isChecked() || lower.isChecked() || number.isChecked());
-            });
-            generated_pass.setText(generatePassword
-                    .easyToSayGenerate(seek_bar_password.getProgress(),
-                            lower.isChecked(),
-                            upper.isChecked(),
-                            number.isChecked(),
-                            symbol.isChecked()));
-        }
-        if (radioButton3.isChecked()) {
-            number.setEnabled(false);
-            number.setChecked(false);
-            symbol.setEnabled(false);
-            symbol.setChecked(false);
-            lower.setOnCheckedChangeListener((buttonView, isChecked) ->
-                    upper.setEnabled(symbol.isChecked() || number.isChecked() || lower.isChecked()));
-            upper.setOnCheckedChangeListener((buttonView, isChecked) ->
-                    lower.setEnabled(symbol.isChecked() || number.isChecked() || upper.isChecked()));
-            generated_pass.setText(generatePassword
-                    .easyToReadGenerate(seek_bar_password.getProgress(),
-                            lower.isChecked(),
-                            upper.isChecked(),
-                            number.isChecked(),
-                            symbol.isChecked()));
-        }
+                });
+                number.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    lower.setEnabled(upper.isChecked() || symbol.isChecked() || number.isChecked());
+                    upper.setEnabled(symbol.isChecked() || lower.isChecked() || number.isChecked());
+                });
+                generated_pass.setText(generatePassword
+                        .easyToSayGenerate(seek_bar_password.getProgress(),
+                                lower.isChecked(),
+                                upper.isChecked(),
+                                number.isChecked(),
+                                symbol.isChecked()));
+            }
+            if (radioButton3.isChecked()) {
+                number.setEnabled(false);
+                number.setChecked(false);
+                symbol.setEnabled(false);
+                symbol.setChecked(false);
+                lower.setChecked(true);
+                if(!upper.isChecked())
+                    lower.setEnabled(false);
+                lower.setOnCheckedChangeListener((buttonView, isChecked) ->
+                        upper.setEnabled(symbol.isChecked() || number.isChecked() || lower.isChecked()));
+                upper.setOnCheckedChangeListener((buttonView, isChecked) ->
+                        lower.setEnabled(symbol.isChecked() || number.isChecked() || upper.isChecked()));
+                generated_pass.setText(generatePassword
+                        .easyToReadGenerate(seek_bar_password.getProgress(),
+                                lower.isChecked(),
+                                upper.isChecked(),
+                                number.isChecked(),
+                                symbol.isChecked()));
+            }
+        });
+
 
         copy.setOnClickListener(v -> {
             ClipboardManager clipboardManager =
