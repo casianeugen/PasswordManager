@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,20 +22,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
-import java.security.SecureRandom;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class GeneratePassFragment extends DialogFragment {
-    private static final String PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
-
     private TextView generated_pass;
     private TextView count_pass_length;
     private SeekBar seek_bar_password;
+
     @NonNull
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        GeneratePassword generatePassword = new GeneratePassword();
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.fragment_generate_pass, null);
         builder.setView(view);
@@ -50,6 +49,11 @@ public class GeneratePassFragment extends DialogFragment {
         RadioButton radioButton1 = view.findViewById(R.id.first);
         RadioButton radioButton2 = view.findViewById(R.id.second);
         RadioButton radioButton3 = view.findViewById(R.id.third);
+
+        SwitchMaterial lower = view.findViewById(R.id.lowercase);
+        SwitchMaterial upper = view.findViewById(R.id.uppercase);
+        SwitchMaterial number = view.findViewById(R.id.numbers);
+        SwitchMaterial symbol = view.findViewById(R.id.symbols);
 
         SpannableString s1 = new SpannableString(radioButton1.getText().toString());
         SpannableString s2 = new SpannableString(radioButton2.getText().toString());
@@ -67,13 +71,41 @@ public class GeneratePassFragment extends DialogFragment {
         radioButton3.setText(s3);
 
         count_pass_length.setText(String.valueOf(seek_bar_password.getProgress()));
-        generated_pass.setText(generatePassword(seek_bar_password.getProgress()));
+        generated_pass.setText(generatePassword
+                .seekBarGenerate(seek_bar_password.getProgress(),
+                        lower.isChecked(),
+                        upper.isChecked(),
+                        number.isChecked(),
+                        symbol.isChecked()));
 
         seek_bar_password.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 count_pass_length.setText(String.valueOf(seek_bar_password.getProgress()));
-                generated_pass.setText(generatePassword(seek_bar_password.getProgress()));
+                if (radioButton1.isChecked()) {
+                    generated_pass.setText(generatePassword
+                            .seekBarGenerate(seek_bar_password.getProgress(),
+                                    lower.isChecked(),
+                                    upper.isChecked(),
+                                    number.isChecked(),
+                                    symbol.isChecked()));
+                }
+                if (radioButton2.isChecked()) {
+                    generated_pass.setText(generatePassword
+                            .easyToSayGenerate(seek_bar_password.getProgress(),
+                                    lower.isChecked(),
+                                    upper.isChecked(),
+                                    number.isChecked(),
+                                    symbol.isChecked()));
+                }
+                if (radioButton3.isChecked()) {
+                    generated_pass.setText(generatePassword
+                            .easyToReadGenerate(seek_bar_password.getProgress(),
+                                    lower.isChecked(),
+                                    upper.isChecked(),
+                                    number.isChecked(),
+                                    symbol.isChecked()));
+                }
             }
 
             @Override
@@ -87,6 +119,78 @@ public class GeneratePassFragment extends DialogFragment {
             }
         });
 
+        if (radioButton1.isChecked()) {
+            symbol.setEnabled(true);
+            number.setEnabled(true);
+            lower.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                symbol.setEnabled(upper.isChecked() || number.isChecked() || lower.isChecked());
+                upper.setEnabled(symbol.isChecked() || number.isChecked() || lower.isChecked());
+                number.setEnabled(upper.isChecked() || symbol.isChecked() || lower.isChecked());
+            });
+            upper.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                symbol.setEnabled(lower.isChecked() || number.isChecked() || upper.isChecked());
+                number.setEnabled(lower.isChecked() || symbol.isChecked() || upper.isChecked());
+                lower.setEnabled(symbol.isChecked() || number.isChecked() || upper.isChecked());
+            });
+            number.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                symbol.setEnabled(upper.isChecked() || lower.isChecked() || number.isChecked());
+                lower.setEnabled(upper.isChecked() || symbol.isChecked() || number.isChecked());
+                upper.setEnabled(symbol.isChecked() || lower.isChecked() || number.isChecked());
+            });
+            symbol.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                lower.setEnabled(upper.isChecked() || number.isChecked() || symbol.isChecked());
+                number.setEnabled(upper.isChecked() || lower.isChecked() || symbol.isChecked());
+                upper.setEnabled(lower.isChecked() || number.isChecked() || symbol.isChecked());
+            });
+            generated_pass.setText(generatePassword
+                    .seekBarGenerate(seek_bar_password.getProgress(),
+                            lower.isChecked(),
+                            upper.isChecked(),
+                            number.isChecked(),
+                            symbol.isChecked()));
+        }
+        if (radioButton2.isChecked()) {
+            symbol.setEnabled(false);
+            symbol.setChecked(false);
+            number.setEnabled(true);
+            lower.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                upper.setEnabled(symbol.isChecked() || number.isChecked() || lower.isChecked());
+                number.setEnabled(upper.isChecked() || symbol.isChecked() || lower.isChecked());
+
+            });
+            upper.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                lower.setEnabled(symbol.isChecked() || number.isChecked() || upper.isChecked());
+                number.setEnabled(symbol.isChecked() || lower.isChecked() || upper.isChecked());
+
+            });
+            number.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                lower.setEnabled(upper.isChecked() || symbol.isChecked() || number.isChecked());
+                upper.setEnabled(symbol.isChecked() || lower.isChecked() || number.isChecked());
+            });
+            generated_pass.setText(generatePassword
+                    .easyToSayGenerate(seek_bar_password.getProgress(),
+                            lower.isChecked(),
+                            upper.isChecked(),
+                            number.isChecked(),
+                            symbol.isChecked()));
+        }
+        if (radioButton3.isChecked()) {
+            number.setEnabled(false);
+            number.setChecked(false);
+            symbol.setEnabled(false);
+            symbol.setChecked(false);
+            lower.setOnCheckedChangeListener((buttonView, isChecked) ->
+                    upper.setEnabled(symbol.isChecked() || number.isChecked() || lower.isChecked()));
+            upper.setOnCheckedChangeListener((buttonView, isChecked) ->
+                    lower.setEnabled(symbol.isChecked() || number.isChecked() || upper.isChecked()));
+            generated_pass.setText(generatePassword
+                    .easyToReadGenerate(seek_bar_password.getProgress(),
+                            lower.isChecked(),
+                            upper.isChecked(),
+                            number.isChecked(),
+                            symbol.isChecked()));
+        }
+
         copy.setOnClickListener(v -> {
             ClipboardManager clipboardManager =
                     (ClipboardManager) requireActivity().getSystemService(Context.CLIPBOARD_SERVICE);
@@ -96,8 +200,33 @@ public class GeneratePassFragment extends DialogFragment {
             Toast.makeText(getActivity(), "Password Copied", Toast.LENGTH_SHORT).show();
         });
 
-        refresh.setOnClickListener(
-                v -> generated_pass.setText(generatePassword(seek_bar_password.getProgress())));
+        refresh.setOnClickListener(v -> {
+            if (radioButton1.isChecked()) {
+                generated_pass
+                        .setText(generatePassword
+                                .seekBarGenerate(seek_bar_password.getProgress(),
+                                        lower.isChecked(),
+                                        upper.isChecked(),
+                                        number.isChecked(),
+                                        symbol.isChecked()));
+            }
+            if (radioButton2.isChecked()) {
+                generated_pass.setText(generatePassword
+                        .easyToSayGenerate(seek_bar_password.getProgress(),
+                                lower.isChecked(),
+                                upper.isChecked(),
+                                number.isChecked(),
+                                symbol.isChecked()));
+            }
+            if (radioButton3.isChecked()) {
+                generated_pass.setText(generatePassword
+                        .easyToReadGenerate(seek_bar_password.getProgress(),
+                                lower.isChecked(),
+                                upper.isChecked(),
+                                number.isChecked(),
+                                symbol.isChecked()));
+            }
+        });
 
         cancel.setOnClickListener(v -> dismiss());
 
@@ -106,14 +235,5 @@ public class GeneratePassFragment extends DialogFragment {
         });
 
         return builder.create();
-    }
-
-    private String generatePassword(int length) {
-        StringBuilder password = new StringBuilder(length);
-        SecureRandom random = new SecureRandom();
-        for (int i = 0; i < length; i++) {
-            password.append(PASSWORD_CHARS.charAt(random.nextInt(PASSWORD_CHARS.length())));
-        }
-        return password.toString();
     }
 }

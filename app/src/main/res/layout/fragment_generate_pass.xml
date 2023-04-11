@@ -126,6 +126,7 @@
                     android:textStyle="bold" />
 
                 <RadioGroup
+                    android:id="@+id/types"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -160,8 +161,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="10dp"
                 android:paddingStart="25dp"
+                android:paddingTop="10dp"
                 android:paddingEnd="25dp">
 
                 <TextView
@@ -172,26 +173,32 @@
                     android:textStyle="bold" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/lowercase"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="@string/lowercase_abc"/>
+                    android:text="@string/lowercase_abc" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/uppercase"
+                    android:checked="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/uppercase_abc" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/numbers"
+                    android:checked="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/numbers_123" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/symbols"
+                    android:checked="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/randomized_symbols" />
-
             </LinearLayout>
 
         </LinearLayout>
