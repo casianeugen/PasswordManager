@@ -65,7 +65,6 @@ public class BiometricActivity extends AppCompatActivity {
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                Intent i = getIntent();
                 updateBiometricEnrollmentFlag(Objects.requireNonNull(mAuth.getCurrentUser()).getUid(), true);
                 Intent intent = new Intent(BiometricActivity.this, LoginActivity.class);
                 startActivity(intent);

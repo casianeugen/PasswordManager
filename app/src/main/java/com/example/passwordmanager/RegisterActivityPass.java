@@ -20,6 +20,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -111,17 +112,21 @@ public class RegisterActivityPass extends AppCompatActivity {
                             .addOnCompleteListener(this, task -> {
                                 if (task.isSuccessful()) {
                                     FirebaseUser user = mAuth.getCurrentUser();
-                                    Map<String, Object> userMap = new HashMap<>();
-                                    userMap.put("password_hint", hint);
-                                    assert user != null;
-                                    db1.collection("users").document(user.getUid())
-                                            .set(userMap)
-                                            .addOnSuccessListener(aVoid -> {
-                                                Intent intent = new Intent(RegisterActivityPass.this, BiometricActivity.class);
-                                                startActivity(intent);
-                                                finish();
-                                            })
-                                            .addOnFailureListener(e -> Toast.makeText(this, "Error adding user", Toast.LENGTH_SHORT).show());
+                                    if (user != null) {
+                                        DocumentReference userDocRef = db1.collection("users").document(user.getUid());
+                                        Map<String, Object> userMap = new HashMap<>();
+                                        userMap.put("password_hint", hint);
+                                        db1.collection("users").document(user.getUid())
+                                                .set(userMap)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Intent intent = new Intent(RegisterActivityPass.this, BiometricActivity.class);
+                                                    startActivity(intent);
+                                                    finish();
+                                                })
+                                                .addOnFailureListener(e -> Toast.makeText(this, "Error adding user", Toast.LENGTH_SHORT).show());
+                                    } else {
+                                        Toast.makeText(this, "User is not logged in", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
                 }

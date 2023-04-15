@@ -104,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                                 emailError.setError("Check your email address and try again");
 
                                 passError.setErrorEnabled(true);
-                                passError.setError("Check your password address and try again");
+                                passError.setError("Check your password and try again");
                             }
                         });
             } catch (IllegalArgumentException ex) {

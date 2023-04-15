@@ -5,10 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".ListFragment">
 
-    <ListView
-        android:id="@+id/all_list"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent">
-
-    </ListView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

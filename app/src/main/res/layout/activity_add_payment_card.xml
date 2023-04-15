@@ -157,7 +157,7 @@
         app:hintTextColor="@color/main">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/notes_pass"
+            android:id="@+id/notes_payment_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/notes"
