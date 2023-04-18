@@ -1,6 +1,5 @@
 package com.example.passwordmanager;
 
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +15,12 @@ import java.util.List;
 import java.util.Objects;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
-
     private final List<DocumentSnapshot> mData;
 
     public CustomAdapter(List<DocumentSnapshot> data) {
         this.mData = data;
     }
+
 
     @NonNull
     @Override

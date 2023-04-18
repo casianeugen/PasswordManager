@@ -2,18 +2,19 @@ package com.example.passwordmanager;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.passwordmanager.R;
 import com.example.passwordmanager.databinding.FragmentPasswordsBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,15 +25,21 @@ import java.util.List;
 
 public class PasswordsFragment extends Fragment {
 
+    private FragmentPasswordsBinding binding;
+    private CustomAdapter adapter;
+    private FirebaseFirestore db;
+    private FirebaseUser user;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_passwords, container, false);
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
+        binding = FragmentPasswordsBinding.inflate(inflater, container, false);
 
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerview);
+        db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+
+        RecyclerView recyclerView = binding.recyclerview;
         recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
         if (user != null) {
@@ -40,18 +47,18 @@ public class PasswordsFragment extends Fragment {
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
-                        CustomAdapter adapter = new CustomAdapter(data);
+                        adapter = new CustomAdapter(data);
                         recyclerView.setAdapter(adapter);
                     })
-                    .addOnFailureListener(e -> {
-                        Log.e("MainActivity", "Error retrieving data from Firestore", e);
-                    });
+                    .addOnFailureListener(e -> Log.e("PasswordsFragment", "Error retrieving data from Firestore", e));
         }
-        return view;
+
+        return binding.getRoot();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        binding = null;
     }
 }

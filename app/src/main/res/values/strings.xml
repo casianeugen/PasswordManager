@@ -75,4 +75,7 @@
     <string name="security_code">Security code</string>
     <string name="expiration_date">Expiration date</string>
     <string name="icon">icon</string>
+    <string name="modify">Modify</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
 </resources>

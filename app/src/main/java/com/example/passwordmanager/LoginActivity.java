@@ -17,13 +17,10 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
-    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     TextInputEditText login_mail;
     TextInputEditText login_pass;
     LinearLayout bio;
@@ -43,7 +40,6 @@ public class LoginActivity extends AppCompatActivity {
         String lastLoggedInUserId = sph.getStringValue("lastLoginUserID");
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseFirestore db1 = FirebaseFirestore.getInstance();
 
 //        if(lastLoggedInUserId != null){
 //            Intent intent = new Intent(LoginActivity.this, MainActivity.class);

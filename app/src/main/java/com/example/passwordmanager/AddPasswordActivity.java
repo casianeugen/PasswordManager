@@ -90,6 +90,7 @@ public class AddPasswordActivity extends AppCompatActivity {
                     pass_info_map.put("7)Notes", Objects.requireNonNull(notes_pass.getText()).toString());
                     passwordColRef.document(name_pass.getText().toString()).set(pass_info_map);
                     startActivity(new Intent(AddPasswordActivity.this, MainActivity.class));
+                    finish();
                 }
             } else {
                 Toast.makeText(this, "User is not logged in", Toast.LENGTH_SHORT).show();
