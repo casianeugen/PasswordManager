@@ -42,7 +42,6 @@ public class BioLogin implements TextWatcher {
                 if (task.isSuccessful()){
                     DocumentSnapshot document = task.getResult();
                     if(document.exists()){
-                        Boolean value = document.getBoolean("biometricEnrolled");
                         if (Objects.equals(document.getBoolean("biometricEnrolled"), true)
                                 && Objects.requireNonNull(mail.getText()).toString().equals(user.getEmail())) {
                             bio.setVisibility(View.VISIBLE);
