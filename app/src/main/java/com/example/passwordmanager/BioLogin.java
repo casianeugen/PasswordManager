@@ -18,7 +18,6 @@ import java.util.Objects;
 public class BioLogin implements TextWatcher {
     private final LinearLayout bio;
     private final TextInputEditText mail;
-    SharedPreferencesHelper sph;
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     public BioLogin(LinearLayout bio, TextInputEditText mail) {
