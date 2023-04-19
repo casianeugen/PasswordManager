@@ -250,7 +250,4 @@ public class GeneratePassFragment extends DialogFragment {
 
         return builder.create();
     }
-    public void checkState(){
-
-    }
 }
