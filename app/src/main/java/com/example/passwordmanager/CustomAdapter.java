@@ -39,27 +39,28 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             popupMenu.getMenuInflater().inflate(R.menu.context_menu, popupMenu.getMenu());
             DocumentSnapshot document = mData.get(viewHolder.getAdapterPosition());
             popupMenu.setOnMenuItemClickListener(item -> {
-                switch (item.getItemId()) {
-                    case R.id.edit:
-                        Intent i = new Intent(mActivity, AddPasswordActivity.class);
-                        String id_edit = document.getId();
-                        i.putExtra("documentId", id_edit);
-                        mActivity.startActivity(i);
-                        return true;
-                    case R.id.delete:
-                        int position = viewHolder.getAdapterPosition();
-                        String id = document.getId();
-                        String type = document.getString("1)Type");
-                        if (mAuth.getCurrentUser() != null && type != null)
-                            FirebaseFirestore.getInstance().collection("users")
+                if(item.getItemId() == R.id.edit){
+                    Intent i;
+                    if (Objects.equals(document.getString("1)Type"), "payment_card"))
+                        i = new Intent(mActivity, AddPaymentCardActivity.class);
+                    else
+                        i = new Intent(mActivity, AddPasswordActivity.class);
+                    String id_edit = document.getId();
+                    i.putExtra("documentId", id_edit);
+                    mActivity.startActivity(i);
+                }
+                else {
+                    int position = viewHolder.getAdapterPosition();
+                    String id = document.getId();
+                    String type = document.getString("1)Type");
+                    if (mAuth.getCurrentUser() != null && type != null)
+                        FirebaseFirestore.getInstance().collection("users")
                                 .document(mAuth.getCurrentUser().getUid())
                                 .collection(type).document(id).delete();
-                        mData.remove(position);
-                        notifyItemRemoved(position);
-                        return true;
-                    default:
-                        return false;
+                    mData.remove(position);
+                    notifyItemRemoved(position);
                 }
+                return true;
             });
             popupMenu.show();
             return true;

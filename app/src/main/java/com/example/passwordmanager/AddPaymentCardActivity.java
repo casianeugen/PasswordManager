@@ -3,6 +3,7 @@ package com.example.passwordmanager;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -22,6 +23,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -32,6 +34,9 @@ import java.util.Objects;
 public class AddPaymentCardActivity extends AppCompatActivity {
     private Calendar calendar;
     TextInputEditText expiration_payment_card;
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseFirestore db1 = FirebaseFirestore.getInstance();
+    FirebaseUser user = mAuth.getCurrentUser();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,10 +58,29 @@ public class AddPaymentCardActivity extends AppCompatActivity {
         Button cancel_button = findViewById(R.id.cancel_button);
         expiration_payment_card = findViewById(R.id.expiration_payment_card);
 
+        Intent i = getIntent();
+        name_card.setText(i.getStringExtra("documentId"));
+        if(Objects.requireNonNull(name_card.getText()).toString().equals(i.getStringExtra("documentId"))){
+            add_button.setText(R.string.edit);
+            DocumentReference pass_edit = db1.collection("users").document(user.getUid())
+                    .collection("payment_card").document(i.getStringExtra("documentId"));
+            pass_edit.get().addOnSuccessListener(documentSnapshot -> {
+                if(documentSnapshot.exists()){
+                    name_card.setText(documentSnapshot.getString("3)Name"));
+                    name_payment_card_edit.setText(documentSnapshot.getString("4)Card Name"));
+                    type_payment_card.setText(documentSnapshot.getString("5)Card Type"));
+                    number_card.setText(documentSnapshot.getString("6)Number"));
+                    security_payment_card.setText(documentSnapshot.getString("7)Security Code"));
+                    expiration_payment_card.setText(documentSnapshot.getString("8)Expiration Date"));
+                    notes_payment_card.setText(documentSnapshot.getString("9)Notes"));
+                }
+                else {
+                    Log.d("TAG", "No such document");
+                }
+            });
+        }
+
         add_button.setOnClickListener(view -> {
-            FirebaseAuth mAuth = FirebaseAuth.getInstance();
-            FirebaseFirestore db1 = FirebaseFirestore.getInstance();
-            FirebaseUser user = mAuth.getCurrentUser();
             if (user != null) {
                 if (!isPaymentCardNumberValid(Objects.requireNonNull(number_card.getText()).toString())){
                     number.setErrorEnabled(true);
@@ -77,7 +101,11 @@ public class AddPaymentCardActivity extends AppCompatActivity {
                     card_info_map.put("6)Number", Objects.requireNonNull(number_card.getText()).toString());
                     card_info_map.put("7)Security Code", Objects.requireNonNull(security_payment_card.getText()).toString());
                     card_info_map.put("8)Expiration Date", Objects.requireNonNull(expiration_payment_card.getText()).toString());
-                    passwordColRef.document(name_card.getText().toString()).set(card_info_map);
+                    card_info_map.put("9)Notes", Objects.requireNonNull(notes_payment_card.getText()).toString());
+                    if(add_button.getText().toString().equals("Edit"))
+                        passwordColRef.document(i.getStringExtra("documentId")).set(card_info_map);
+                    else
+                        passwordColRef.document(random_id()).set(card_info_map);
                     startActivity(new Intent(AddPaymentCardActivity.this, MainActivity.class));
                     finish();
                 }
@@ -160,5 +188,9 @@ public class AddPaymentCardActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    public String random_id(){
+        SecureRandom random = new SecureRandom();
+        return String.valueOf(random.nextInt(1000));
     }
 }

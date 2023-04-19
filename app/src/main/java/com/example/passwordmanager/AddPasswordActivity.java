@@ -53,8 +53,7 @@ public class AddPasswordActivity extends AppCompatActivity {
 
         pass_pass.setText(i.getStringExtra("password"));
         name_pass.setText(i.getStringExtra("documentId"));
-        if(name_pass.getText().toString().equals(i.getStringExtra("documentId"))){
-            name.setEnabled(false);
+        if(Objects.requireNonNull(name_pass.getText()).toString().equals(i.getStringExtra("documentId"))){
             add_button.setText(R.string.edit);
             DocumentReference pass_edit = db1.collection("users").document(user.getUid())
                     .collection("passwords").document(i.getStringExtra("documentId"));
@@ -110,7 +109,10 @@ public class AddPasswordActivity extends AppCompatActivity {
                     pass_info_map.put("5)Username", Objects.requireNonNull(username_pass.getText()).toString());
                     pass_info_map.put("6)Password", Objects.requireNonNull(pass_pass.getText()).toString());
                     pass_info_map.put("7)Notes", Objects.requireNonNull(notes_pass.getText()).toString());
-                    passwordColRef.document(random_id()).set(pass_info_map);
+                    if(add_button.getText().toString().equals("Edit"))
+                        passwordColRef.document(i.getStringExtra("documentId")).set(pass_info_map);
+                    else
+                        passwordColRef.document(random_id()).set(pass_info_map);
                     startActivity(new Intent(AddPasswordActivity.this, MainActivity.class));
                     finish();
                 }
