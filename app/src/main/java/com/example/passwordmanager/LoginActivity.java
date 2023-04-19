@@ -17,12 +17,10 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
-    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     TextInputEditText login_mail;
     TextInputEditText login_pass;
     LinearLayout bio;
@@ -38,13 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         sph = new SharedPreferencesHelper(this);
         MaterialTextView reg_link = findViewById(R.id.reg_text);
         MaterialButton button_log_in = findViewById(R.id.button_log_in);
-        bio = findViewById(R.id.bio);
-        emailError = findViewById(R.id.log_email_text);
-        passError = findViewById(R.id.log_pass_text);
 
-        login_mail = findViewById(R.id.log_email);
-        login_pass = findViewById(R.id.log_pass);
-        bio.setVisibility(View.GONE);
         String lastLoggedInUserId = sph.getStringValue("lastLoginUserID");
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -55,18 +47,18 @@ public class LoginActivity extends AppCompatActivity {
 //            finish();
 //        }
 
+        bio = findViewById(R.id.bio);
+        emailError = findViewById(R.id.log_email_text);
+        passError = findViewById(R.id.log_pass_text);
+
+        login_mail = findViewById(R.id.log_email);
+        login_pass = findViewById(R.id.log_pass);
+
         login_mail.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
                 emailError.setErrorEnabled(false);
             }
         });
-
-        FirebaseUser user = mAuth.getCurrentUser();
-
-        if (user != null && Objects.equals(lastLoggedInUserId, user.getUid())) {
-            login_mail.setText(user.getEmail());
-            bio.setVisibility(View.VISIBLE);
-        }
 
         login_pass.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
@@ -74,7 +66,8 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        login_mail.addTextChangedListener(new BioLogin(bio, login_mail));
+        bio.setVisibility(View.GONE);
+        login_mail.addTextChangedListener(new BioLogin(bio, lastLoggedInUserId));
         bio.setOnClickListener(v -> showBiometricPrompt());
 
         reg_link.setOnClickListener(v -> {
@@ -95,20 +88,21 @@ public class LoginActivity extends AppCompatActivity {
                 String email = Objects.requireNonNull(login_mail.getText()).toString().trim();
                 String password = Objects.requireNonNull(login_pass.getText()).toString();
 
-                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        sph.saveStringValue("lastLoginUserID", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        emailError.setErrorEnabled(true);
-                        emailError.setError("Check your email address and try again");
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(this, task -> {
+                            if (task.isSuccessful()) {
+                                sph.saveStringValue("lastLoginUserID", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                emailError.setErrorEnabled(true);
+                                emailError.setError("Check your email address and try again");
 
-                        passError.setErrorEnabled(true);
-                        passError.setError("Check your password and try again");
-                    }
-                });
+                                passError.setErrorEnabled(true);
+                                passError.setError("Check your password and try again");
+                            }
+                        });
             } catch (IllegalArgumentException ex) {
                 emailError.setErrorEnabled(true);
                 emailError.setError("Check your email address and try again");
@@ -120,28 +114,34 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showBiometricPrompt() {
-        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Biometric Login").setSubtitle("Log in with your biometric credentials").setNegativeButtonText("Cancel").build();
+        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric Login")
+                .setSubtitle("Log in with your biometric credentials")
+                .setNegativeButtonText("Cancel")
+                .build();
 
-        BiometricPrompt biometricPrompt = new BiometricPrompt(LoginActivity.this, ContextCompat.getMainExecutor(this), new BiometricPrompt.AuthenticationCallback() {
-            @Override
-            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-                super.onAuthenticationError(errorCode, errString);
-                // Handle authentication error
-            }
+        BiometricPrompt biometricPrompt = new BiometricPrompt(LoginActivity.this,
+                ContextCompat.getMainExecutor(this),
+                new BiometricPrompt.AuthenticationCallback() {
+                    @Override
+                    public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                        super.onAuthenticationError(errorCode, errString);
+                        // Handle authentication error
+                    }
 
-            @Override
-            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-                super.onAuthenticationSucceeded(result);
-                // Perform login action
-                loginWithBiometrics();
-            }
+                    @Override
+                    public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                        super.onAuthenticationSucceeded(result);
+                        // Perform login action
+                        loginWithBiometrics();
+                    }
 
-            @Override
-            public void onAuthenticationFailed() {
-                super.onAuthenticationFailed();
-                // Handle authentication failure
-            }
-        });
+                    @Override
+                    public void onAuthenticationFailed() {
+                        super.onAuthenticationFailed();
+                        // Handle authentication failure
+                    }
+                });
         biometricPrompt.authenticate(promptInfo);
     }
 

@@ -6,8 +6,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -17,13 +15,11 @@ import java.util.Objects;
 
 public class BioLogin implements TextWatcher {
     private final LinearLayout bio;
-    private final TextInputEditText mail;
-    SharedPreferencesHelper sph;
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private final String userID;
 
-    public BioLogin(LinearLayout bio, TextInputEditText mail) {
+    public BioLogin(LinearLayout bio, String userID) {
         this.bio = bio;
-        this.mail = mail;
+        this.userID = userID;
     }
 
     @Override
@@ -34,16 +30,15 @@ public class BioLogin implements TextWatcher {
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
         CollectionReference collectionRef = db.collection("users");
-        if (user != null) {
-            DocumentReference docRef = collectionRef.document(user.getUid());
+        if (userID != null) {
+            DocumentReference docRef = collectionRef.document(userID);
             docRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()){
                     DocumentSnapshot document = task.getResult();
                     if(document.exists()){
-                        if (Objects.equals(document.getBoolean("biometricEnrolled"), true)
-                                && Objects.requireNonNull(mail.getText()).toString().equals(user.getEmail())) {
+                        Boolean value = document.getBoolean("biometricEnrolled");
+                        if (Objects.equals(value, true)) {
                             bio.setVisibility(View.VISIBLE);
                         } else {
                             // User doesn't exist in the database, hide the button
