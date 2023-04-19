@@ -40,7 +40,7 @@ public class ListFragment extends Fragment {
                                 .addOnSuccessListener(queryDocumentSnapshots1 -> {
                                     List<DocumentSnapshot> data2 = queryDocumentSnapshots1.getDocuments();
                                     data1.addAll(data2);
-                                    CustomAdapter adapter = new CustomAdapter(data1);
+                                    CustomAdapter adapter = new CustomAdapter(data1, requireActivity());
                                     recyclerView.setAdapter(adapter);
                                 })
                                 .addOnFailureListener(e -> Log.e("MainActivity", "Error retrieving data from Firestore", e));

@@ -2,6 +2,7 @@ package com.example.passwordmanager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -20,11 +21,16 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class AddPasswordActivity extends AppCompatActivity {
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseFirestore db1 = FirebaseFirestore.getInstance();
+    FirebaseUser user = mAuth.getCurrentUser();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +52,25 @@ public class AddPasswordActivity extends AppCompatActivity {
         Intent i = getIntent();
 
         pass_pass.setText(i.getStringExtra("password"));
+        name_pass.setText(i.getStringExtra("documentId"));
+        if(name_pass.getText().toString().equals(i.getStringExtra("documentId"))){
+            name.setEnabled(false);
+            add_button.setText(R.string.edit);
+            DocumentReference pass_edit = db1.collection("users").document(user.getUid())
+                    .collection("passwords").document(i.getStringExtra("documentId"));
+            pass_edit.get().addOnSuccessListener(documentSnapshot -> {
+                if(documentSnapshot.exists()){
+                    name_pass.setText(documentSnapshot.getString("3)Name"));
+                    url_pass.setText(documentSnapshot.getString("4)Url"));
+                    username_pass.setText(documentSnapshot.getString("5)Username"));
+                    pass_pass.setText(documentSnapshot.getString("6)Password"));
+                    notes_pass.setText(documentSnapshot.getString("7)Notes"));
+                }
+                else {
+                    Log.d("TAG", "No such document");
+                }
+            });
+        }
 
         notes_pass.setOnFocusChangeListener((view, b) -> {
             if (b) {
@@ -69,9 +94,6 @@ public class AddPasswordActivity extends AppCompatActivity {
         });
 
         add_button.setOnClickListener(view -> {
-            FirebaseAuth mAuth = FirebaseAuth.getInstance();
-            FirebaseFirestore db1 = FirebaseFirestore.getInstance();
-            FirebaseUser user = mAuth.getCurrentUser();
             if (user != null) {
                 if (Objects.requireNonNull(name_pass.getText()).toString().isEmpty()) {
                     name.setErrorEnabled(true);
@@ -81,14 +103,14 @@ public class AddPasswordActivity extends AppCompatActivity {
                     CollectionReference passwordColRef = userDocRef.collection("passwords");
 
                     Map<String, Object> pass_info_map = new HashMap<>();
-                    pass_info_map.put("1)Type", "password");
+                    pass_info_map.put("1)Type", "passwords");
                     pass_info_map.put("2)Icon", R.drawable.ic_menu_password);
                     pass_info_map.put("3)Name", name_pass.getText().toString());
                     pass_info_map.put("4)Url", Objects.requireNonNull(url_pass.getText()).toString());
                     pass_info_map.put("5)Username", Objects.requireNonNull(username_pass.getText()).toString());
                     pass_info_map.put("6)Password", Objects.requireNonNull(pass_pass.getText()).toString());
                     pass_info_map.put("7)Notes", Objects.requireNonNull(notes_pass.getText()).toString());
-                    passwordColRef.document(name_pass.getText().toString()).set(pass_info_map);
+                    passwordColRef.document(random_id()).set(pass_info_map);
                     startActivity(new Intent(AddPasswordActivity.this, MainActivity.class));
                     finish();
                 }
@@ -103,5 +125,9 @@ public class AddPasswordActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    public String random_id(){
+        SecureRandom random = new SecureRandom();
+        return String.valueOf(random.nextInt(1000));
     }
 }
