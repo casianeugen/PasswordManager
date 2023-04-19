@@ -73,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         if (user != null && Objects.equals(lastLoggedInUserId, user.getUid())) {
             login_mail.setText(user.getEmail());
             bio.setVisibility(View.VISIBLE);
+            showBiometricPrompt();
         }
 
         login_mail.addTextChangedListener(new BioLogin(bio, login_mail));
@@ -96,21 +97,20 @@ public class LoginActivity extends AppCompatActivity {
                 String email = Objects.requireNonNull(login_mail.getText()).toString().trim();
                 String password = Objects.requireNonNull(login_pass.getText()).toString();
 
-                mAuth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(this, task -> {
-                            if (task.isSuccessful()) {
-                                sph.saveStringValue("lastLoginUserID", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                emailError.setErrorEnabled(true);
-                                emailError.setError("Check your email address and try again");
+                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        sph.saveStringValue("lastLoginUserID", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        emailError.setErrorEnabled(true);
+                        emailError.setError("Check your email address and try again");
 
-                                passError.setErrorEnabled(true);
-                                passError.setError("Check your password and try again");
-                            }
-                        });
+                        passError.setErrorEnabled(true);
+                        passError.setError("Check your password and try again");
+                    }
+                });
             } catch (IllegalArgumentException ex) {
                 emailError.setErrorEnabled(true);
                 emailError.setError("Check your email address and try again");
@@ -122,34 +122,28 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showBiometricPrompt() {
-        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Biometric Login")
-                .setSubtitle("Log in with your biometric credentials")
-                .setNegativeButtonText("Cancel")
-                .build();
+        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Biometric Login").setSubtitle("Log in with your biometric credentials").setNegativeButtonText("Cancel").build();
 
-        BiometricPrompt biometricPrompt = new BiometricPrompt(LoginActivity.this,
-                ContextCompat.getMainExecutor(this),
-                new BiometricPrompt.AuthenticationCallback() {
-                    @Override
-                    public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-                        super.onAuthenticationError(errorCode, errString);
-                        // Handle authentication error
-                    }
+        BiometricPrompt biometricPrompt = new BiometricPrompt(LoginActivity.this, ContextCompat.getMainExecutor(this), new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+                // Handle authentication error
+            }
 
-                    @Override
-                    public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-                        super.onAuthenticationSucceeded(result);
-                        // Perform login action
-                        loginWithBiometrics();
-                    }
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                // Perform login action
+                loginWithBiometrics();
+            }
 
-                    @Override
-                    public void onAuthenticationFailed() {
-                        super.onAuthenticationFailed();
-                        // Handle authentication failure
-                    }
-                });
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+                // Handle authentication failure
+            }
+        });
         biometricPrompt.authenticate(promptInfo);
     }
 
