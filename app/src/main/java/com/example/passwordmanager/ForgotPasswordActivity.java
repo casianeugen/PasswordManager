@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -49,9 +50,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                         } else {
                             boolean check = !Objects.requireNonNull(task.getResult().getSignInMethods()).isEmpty();
                             if (check) {
+                                auth.sendPasswordResetEmail(email.getText().toString());
                                 Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
                                 intent.putExtra("email", email.getText().toString());
                                 startActivity(intent);
+                                Toast.makeText(this, "Email for password reset was sent.", Toast.LENGTH_LONG).show();
                             } else {
                                 email_text.setErrorEnabled(true);
                                 email_text.setError("Email does not exist");
