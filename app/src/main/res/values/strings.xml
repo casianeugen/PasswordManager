@@ -29,16 +29,12 @@
     <string name="terms">By completing this form, you agree to the following terms and conditions:</string>
     <string name="log_with_fingerprint">Login with fingerprint</string>
 
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
     <string name="all_items">All items</string>
     <string name="passwords">Passwords</string>
     <string name="payment_cards">Payment cards</string>
     <string name="generate_password">Generate Password</string>
     <string name="about">About</string>
     <string name="settings">Settings</string>
-    <string name="logo_about_dialog">logo about dialog</string>
     <string name="version_1_0_0_0">Version 1.0.0.0</string>
     <string name="build_21_04_2023_12_41_am">Build: 21/04/2023 12:41 AM</string>
     <string name="copyright">Copyright 2023 PassVault. All Rights Reserved.</string>
@@ -75,7 +71,6 @@
     <string name="security_code">Security code</string>
     <string name="expiration_date">Expiration date</string>
     <string name="icon">icon</string>
-    <string name="modify">Modify</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
 </resources>

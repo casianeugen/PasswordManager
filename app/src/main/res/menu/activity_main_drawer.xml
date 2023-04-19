@@ -2,19 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_gravity="start"
-    tools:showIn="navigation_view">
+    tools:showIn="navigation_view"
+    android:divider="@color/main"
+    android:dividerHeight="1dp">
 
-    <group
-        android:id="@+id/menu_top"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_all"
             android:icon="@drawable/ic_menu_allitems"
             android:title="@string/all_items" />
     </group>
-    <group
-        android:id="@+id/menu_info"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_passwords"
             android:icon="@drawable/ic_menu_password"
@@ -24,17 +22,13 @@
             android:icon="@drawable/ic_menu_card"
             android:title="@string/payment_cards" />
     </group>
-    <group
-        android:id="@+id/menu_generate"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_generate_password"
             android:icon="@drawable/ic_menu_generate_pass"
             android:title="@string/generate_password" />
     </group>
-    <group
-        android:id="@+id/menu_about"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_menu_about"

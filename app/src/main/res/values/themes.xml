@@ -30,20 +30,6 @@
         <item name="android:statusBarColor">@color/main</item>
     </style>
 
-    <style name="Theme.PasswordManager.Dark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/main</item>
-        <item name="colorPrimaryVariant">@color/main</item>
-        <item name="colorOnPrimary">@color/main</item>
-        <item name="android:windowBackground">@color/background</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/main</item>
-        <item name="colorSecondaryVariant">@color/main</item>
-        <item name="colorOnSecondary">@color/main</item>
-        <item name="android:statusBarColor">@color/main</item>
-        <item name="android:textColorPrimary">@color/background</item>
-        <!-- Status bar color. -->
-    </style>
-
     <style name="CustomProgressBarStyle" parent="Widget.AppCompat.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/custom_progress_bar</item>
         <item name="android:minHeight">3dp</item>
@@ -54,11 +40,6 @@
 
     <style name="menuIcon" parent="ThemeOverlay.AppCompat.ActionBar">
         <item name="android:textColorPrimary">@color/white</item>
-    </style>
-
-    <style name="Theme.PasswordManager.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
     </style>
 
 </resources>

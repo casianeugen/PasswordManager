@@ -7,13 +7,11 @@
     android:padding="16dp">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/alert_image_view"
         android:layout_width="match_parent"
         android:layout_height="102dp"
         android:src="@drawable/about_icon" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/alert_title_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/version_1_0_0_0"
@@ -21,14 +19,12 @@
         android:paddingTop="10dp"/>
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/alert_message_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/build_21_04_2023_12_41_am"
         android:textColor="@color/black"
         android:paddingTop="10dp" />
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/alert_message_copyright"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/copyright"
