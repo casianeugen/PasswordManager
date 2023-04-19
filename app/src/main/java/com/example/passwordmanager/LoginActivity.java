@@ -17,6 +17,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Objects;
 
@@ -53,6 +54,7 @@ public class LoginActivity extends AppCompatActivity {
 
         login_mail = findViewById(R.id.log_email);
         login_pass = findViewById(R.id.log_pass);
+        bio.setVisibility(View.GONE);
 
         login_mail.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
@@ -66,8 +68,14 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        bio.setVisibility(View.GONE);
-        login_mail.addTextChangedListener(new BioLogin(bio, lastLoggedInUserId));
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if (user != null && Objects.equals(lastLoggedInUserId, user.getUid())) {
+            login_mail.setText(user.getEmail());
+            bio.setVisibility(View.VISIBLE);
+        }
+
+        login_mail.addTextChangedListener(new BioLogin(bio, login_mail));
         bio.setOnClickListener(v -> showBiometricPrompt());
 
         reg_link.setOnClickListener(v -> {
