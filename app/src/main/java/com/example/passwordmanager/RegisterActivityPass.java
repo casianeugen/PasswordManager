@@ -20,8 +20,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -113,7 +111,6 @@ public class RegisterActivityPass extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     if (user != null) {
-                                        DocumentReference userDocRef = db1.collection("users").document(user.getUid());
                                         Map<String, Object> userMap = new HashMap<>();
                                         userMap.put("password_hint", hint);
                                         db1.collection("users").document(user.getUid())

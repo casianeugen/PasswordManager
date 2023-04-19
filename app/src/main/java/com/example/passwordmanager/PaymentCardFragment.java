@@ -39,9 +39,7 @@ public class PaymentCardFragment extends Fragment {
                         CustomAdapter adapter = new CustomAdapter(data, requireActivity());
                         recyclerView.setAdapter(adapter);
                     })
-                    .addOnFailureListener(e -> {
-                        Log.e("MainActivity", "Error retrieving data from Firestore", e);
-                    });
+                    .addOnFailureListener(e -> Log.e("MainActivity", "Error retrieving data from Firestore", e));
         }
         return view;
     }

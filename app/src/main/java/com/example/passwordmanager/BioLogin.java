@@ -6,8 +6,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -17,12 +15,10 @@ import java.util.Objects;
 
 public class BioLogin implements TextWatcher {
     private final LinearLayout bio;
-    private final TextInputEditText log_email;
     private final String userID;
 
-    public BioLogin(LinearLayout bio, TextInputEditText log_email, String userID) {
+    public BioLogin(LinearLayout bio, String userID) {
         this.bio = bio;
-        this.log_email = log_email;
         this.userID = userID;
     }
 

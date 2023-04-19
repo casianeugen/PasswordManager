@@ -40,9 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         };
         mAuth.addAuthStateListener(authStateListener);
-        logout.setOnClickListener(view -> {
-            mAuth.signOut();
-        });
+        logout.setOnClickListener(view -> mAuth.signOut());
     }
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

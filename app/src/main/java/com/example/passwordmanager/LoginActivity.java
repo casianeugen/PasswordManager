@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         bio.setVisibility(View.GONE);
-        login_mail.addTextChangedListener(new BioLogin(bio, login_mail, lastLoggedInUserId));
+        login_mail.addTextChangedListener(new BioLogin(bio, lastLoggedInUserId));
         bio.setOnClickListener(v -> showBiometricPrompt());
 
         reg_link.setOnClickListener(v -> {
