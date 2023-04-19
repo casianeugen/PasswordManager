@@ -121,6 +121,7 @@ public class GeneratePassFragment extends DialogFragment {
             }
         });
 
+
         types.setOnCheckedChangeListener((compoundButton, b) -> {
             if (radioButton1.isChecked()) {
                 symbol.setEnabled(true);
@@ -248,5 +249,8 @@ public class GeneratePassFragment extends DialogFragment {
         });
 
         return builder.create();
+    }
+    public void checkState(){
+
     }
 }
