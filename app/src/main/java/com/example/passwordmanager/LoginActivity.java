@@ -42,12 +42,6 @@ public class LoginActivity extends AppCompatActivity {
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
-//        if(lastLoggedInUserId != null){
-//            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//            startActivity(intent);
-//            finish();
-//        }
-
         bio = findViewById(R.id.bio);
         emailError = findViewById(R.id.log_email_text);
         passError = findViewById(R.id.log_pass_text);
