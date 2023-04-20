@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -39,7 +40,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             popupMenu.getMenuInflater().inflate(R.menu.context_menu, popupMenu.getMenu());
             DocumentSnapshot document = mData.get(viewHolder.getAdapterPosition());
             popupMenu.setOnMenuItemClickListener(item -> {
-                if(item.getItemId() == R.id.edit){
+                if (item.getItemId() == R.id.edit) {
                     Intent i;
                     if (Objects.equals(document.getString("1)Type"), "payment_card"))
                         i = new Intent(mActivity, AddPaymentCardActivity.class);
@@ -48,8 +49,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
                     String id_edit = document.getId();
                     i.putExtra("documentId", id_edit);
                     mActivity.startActivity(i);
-                }
-                else {
+                } else if (item.getItemId() == R.id.delete) {
                     int position = viewHolder.getAdapterPosition();
                     String id = document.getId();
                     String type = document.getString("1)Type");
@@ -59,6 +59,18 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
                                 .collection(type).document(id).delete();
                     mData.remove(position);
                     notifyItemRemoved(position);
+                } else if (item.getItemId() == R.id.view) {
+                    String type = document.getString("1)Type");
+                    DialogView dialog;
+                    if (Objects.equals(type, "payment_card")){
+                        dialog = new DialogView(mActivity, document.getString("3)Name"),
+                                document.getString("6)Number"));
+                    } else {
+                        dialog = new DialogView(mActivity, document.getString("3)Name"),
+                                document.getString("6)Password"));
+                    }
+                    dialog.show();
+
                 }
                 return true;
             });

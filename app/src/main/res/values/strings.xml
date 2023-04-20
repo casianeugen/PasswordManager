@@ -26,7 +26,7 @@
     <string name="recover_account">RECOVER ACCOUNT</string>
     <string name="or_send_hint">OR SEND HINT</string>
     <string name="pass_forgot_hint">You can recover your account by tapping on the button below. Alternatively, if you created a password hint \nearlier, we\'ll email it to you.</string>
-    <string name="terms">By completing this form, you agree to the following terms and conditions:</string>
+    <string name="terms">By completing this form, you agree to the following terms and conditions: Terms and conditions</string>
     <string name="log_with_fingerprint">Login with fingerprint</string>
 
     <string name="all_items">All items</string>
@@ -73,4 +73,13 @@
     <string name="icon">icon</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
+    <string name="welcome">Welcome to PassVault, the password manager app that helps you keep your passwords safe and secure.Before registering for our service, please read and agree to the following terms and conditions:</string>
+    <string name="registration">\n1. Registration and Account \na. To use PassVault, you must register an account with us. You agree to provide accurate and complete information during registration and to keep your account information up to date. \nb. You are solely responsible for maintaining the confidentiality of your account credentials, including your username and password. You agree to notify us immediately if you suspect any unauthorized access to your account. \nc. You agree to use PassVault only for lawful purposes and to comply with all applicable laws and regulations.</string>
+    <string name="security">\n2. Security \na. PassVault uses industry-standard encryption and security measures to protect your passwords and personal information. However, you acknowledge that no security system is completely foolproof, and we cannot guarantee the security of your data. \nb. You agree to use PassVault at your own risk and to take reasonable precautions to protect your account and data, such as choosing a strong password and not sharing your account information with others.</string>
+    <string name="user_content">\n3. User Content \na. You retain ownership of any content you upload to PassVault, such as passwords, notes, and other information. However, you grant PassVault a non-exclusive, royalty-free, worldwide license to use, modify, and distribute your content solely for the purpose of providing our service to you. \nb. You agree not to upload any content that violates any applicable laws or infringes on the rights of others, including intellectual property rights.</string>
+    <string name="termination">\n4. Termination \na. You may terminate your PassVault account at any time by contacting us or using the account deletion feature in the app. \nb. We may terminate your account or suspend your access to PassVault at any time, with or without cause, including if we believe that you have violated these terms and conditions.</string>
+    <string name="limitation">\n5. Limitation of Liability \na. PassVault is provided on an \'as is\' and \'as available\' basis, without any warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. \nb. PassVault shall not be liable for any direct, indirect, incidental, special, or consequential damages arising out of or in connection with your use of our service, including but not limited to loss of data or profits, or any other intangible losses.</string>
+    <string name="governing">\n6. Governing Law \na. These terms and conditions shall be governed by and construed in accordance with the laws of the jurisdiction in which PassVault is located. \nb. Any dispute arising out of or in connection with these terms and conditions shall be subject to the exclusive jurisdiction of the courts of the jurisdiction in which PassVault is located.</string>
+    <string name="confirmation">\nBy registering for PassVault, you agree to be bound by these terms and conditions. If you do not agree to these terms and conditions, do not register for our service.</string>
+    <string name="view">View</string>
 </resources>

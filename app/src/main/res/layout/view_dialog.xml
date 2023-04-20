@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/view_title"
+        android:layout_width="300dp"
+        android:layout_height="80dp"
+        android:background="@color/main"
+        android:padding="15dp"
+        android:textColor="@color/background"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:textAlignment="center"/>
+
+    <TextView
+        android:id="@+id/view_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:padding="30dp"/>
+    <Button
+        android:id="@+id/view_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:layout_gravity="end"
+        android:text="@string/ok"
+        android:textStyle="bold"
+        android:textColor="@color/background"/>
+</LinearLayout>

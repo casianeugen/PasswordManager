@@ -37,6 +37,8 @@
                 android:value="" />
         </activity>
         <activity android:name=".RegisterActivity" />
+        <activity android:name=".TermsActivity" />
+        <activity android:name=".DialogView"/>
         <activity
             android:name=".ForgotPasswordActivity"
             android:label="@string/forgot_password"
