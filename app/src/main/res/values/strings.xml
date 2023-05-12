@@ -82,4 +82,5 @@
     <string name="governing">\n6. Governing Law \na. These terms and conditions shall be governed by and construed in accordance with the laws of the jurisdiction in which PassVault is located. \nb. Any dispute arising out of or in connection with these terms and conditions shall be subject to the exclusive jurisdiction of the courts of the jurisdiction in which PassVault is located.</string>
     <string name="confirmation">\nBy registering for PassVault, you agree to be bound by these terms and conditions. If you do not agree to these terms and conditions, do not register for our service.</string>
     <string name="view">View</string>
+    <string name="accessibility_service_description">Your accessibility service description</string>
 </resources>
