@@ -87,7 +87,7 @@ public class AddPasswordActivity extends AppCompatActivity {
         });
 
         cancel_button.setOnClickListener(view -> {
-            Intent intent = new Intent(AddPasswordActivity.this, AddMenuActivity.class);
+            Intent intent = new Intent(AddPasswordActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         });

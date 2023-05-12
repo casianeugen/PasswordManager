@@ -115,7 +115,7 @@ public class AddPaymentCardActivity extends AppCompatActivity {
         });
 
         cancel_button.setOnClickListener(view -> {
-            Intent intent = new Intent(AddPaymentCardActivity.this, AddMenuActivity.class);
+            Intent intent = new Intent(AddPaymentCardActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         });
