@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -37,6 +38,8 @@ public class AddPaymentCardActivity extends AppCompatActivity {
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseFirestore db1 = FirebaseFirestore.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
+    Date date = new Date();
+    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +105,7 @@ public class AddPaymentCardActivity extends AppCompatActivity {
                     card_info_map.put("7)Security Code", Objects.requireNonNull(security_payment_card.getText()).toString());
                     card_info_map.put("8)Expiration Date", Objects.requireNonNull(expiration_payment_card.getText()).toString());
                     card_info_map.put("9)Notes", Objects.requireNonNull(notes_payment_card.getText()).toString());
+                    card_info_map.put("10)UpdatedTime", formatter.format(date));
                     if(add_button.getText().toString().equals("Edit"))
                         passwordColRef.document(i.getStringExtra("documentId")).set(card_info_map);
                     else

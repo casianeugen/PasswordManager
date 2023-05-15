@@ -23,7 +23,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -31,6 +34,8 @@ public class AddPasswordActivity extends AppCompatActivity {
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseFirestore db1 = FirebaseFirestore.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
+    Date date = new Date();
+    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,7 +127,7 @@ public class AddPasswordActivity extends AppCompatActivity {
                         pass_info_map.put("9)Notification", true);
                     else
                         pass_info_map.put("9)Notification", false);
-
+                    pass_info_map.put("10)UpdatedTime", formatter.format(date));
                     if(add_button.getText().toString().equals("Edit"))
                         passwordColRef.document(i.getStringExtra("documentId")).set(pass_info_map);
                     else
