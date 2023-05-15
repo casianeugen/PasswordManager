@@ -83,4 +83,7 @@
     <string name="confirmation">\nBy registering for PassVault, you agree to be bound by these terms and conditions. If you do not agree to these terms and conditions, do not register for our service.</string>
     <string name="view">View</string>
     <string name="accessibility_service_description">Your accessibility service description</string>
+    <string name="autofill">Autofill</string>
+    <string name="expire_notification">Expire notification</string>
+    <string name="old_password_notification">Old password notification</string>
 </resources>

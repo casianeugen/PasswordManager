@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,6 +47,8 @@ public class AddPasswordActivity extends AppCompatActivity {
         TextInputEditText url_pass = findViewById(R.id.url_pass);
         TextInputEditText username_pass = findViewById(R.id.username_pass);
         TextInputEditText pass_pass = findViewById(R.id.pass_pass);
+        MaterialCheckBox autofill = findViewById(R.id.autofill);
+        MaterialCheckBox notification = findViewById(R.id.notification);
         Button cancel_button = findViewById(R.id.cancel_button);
         Button add_button = findViewById(R.id.add_button);
 
@@ -64,6 +67,8 @@ public class AddPasswordActivity extends AppCompatActivity {
                     username_pass.setText(documentSnapshot.getString("5)Username"));
                     pass_pass.setText(documentSnapshot.getString("6)Password"));
                     notes_pass.setText(documentSnapshot.getString("7)Notes"));
+                    autofill.setChecked(Boolean.TRUE.equals(documentSnapshot.getBoolean("8)Autofill")));
+                    notification.setChecked(Boolean.TRUE.equals(documentSnapshot.getBoolean("9)Notification")));
                 }
                 else {
                     Log.d("TAG", "No such document");
@@ -109,6 +114,15 @@ public class AddPasswordActivity extends AppCompatActivity {
                     pass_info_map.put("5)Username", Objects.requireNonNull(username_pass.getText()).toString());
                     pass_info_map.put("6)Password", Objects.requireNonNull(pass_pass.getText()).toString());
                     pass_info_map.put("7)Notes", Objects.requireNonNull(notes_pass.getText()).toString());
+                    if (autofill.isChecked())
+                        pass_info_map.put("8)Autofill", true);
+                    else
+                        pass_info_map.put("8)Autofill", false);
+                    if (notification.isChecked())
+                        pass_info_map.put("9)Notification", true);
+                    else
+                        pass_info_map.put("9)Notification", false);
+
                     if(add_button.getText().toString().equals("Edit"))
                         passwordColRef.document(i.getStringExtra("documentId")).set(pass_info_map);
                     else

@@ -22,7 +22,6 @@ import java.util.List;
 public class PasswordsFragment extends Fragment {
 
     private FragmentPasswordsBinding binding;
-    private CustomAdapter adapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -41,7 +40,7 @@ public class PasswordsFragment extends Fragment {
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         List<DocumentSnapshot> data = queryDocumentSnapshots.getDocuments();
-                        adapter = new CustomAdapter(data, requireActivity());
+                        CustomAdapter adapter = new CustomAdapter(data, requireActivity());
                         recyclerView.setAdapter(adapter);
                     })
                     .addOnFailureListener(e -> Log.e("PasswordsFragment", "Error retrieving data from Firestore", e));

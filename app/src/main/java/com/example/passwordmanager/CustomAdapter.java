@@ -1,21 +1,17 @@
 package com.example.passwordmanager;
 
-import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 import java.util.Objects;
@@ -23,11 +19,18 @@ import java.util.Objects;
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
     private final List<DocumentSnapshot> mData;
     private final FragmentActivity mActivity;
-    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     public CustomAdapter(List<DocumentSnapshot> data, FragmentActivity activity) {
         this.mData = data;
         this.mActivity = activity;
+    }
+
+    public void deleteItem(int position) {
+        // Delete the item from your dataset
+        mData.remove(position);
+
+        // Notify the adapter that an item has been removed at the specified position
+        notifyItemRemoved(position);
     }
 
     @NonNull
@@ -35,47 +38,13 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.custom_list_view, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
-        viewHolder.itemView.setOnLongClickListener(v -> {
-            PopupMenu popupMenu = new PopupMenu(mActivity, v);
-            popupMenu.getMenuInflater().inflate(R.menu.context_menu, popupMenu.getMenu());
+        viewHolder.itemView.setOnClickListener(v -> {
             DocumentSnapshot document = mData.get(viewHolder.getAdapterPosition());
-            popupMenu.setOnMenuItemClickListener(item -> {
-                if (item.getItemId() == R.id.edit) {
-                    Intent i;
-                    if (Objects.equals(document.getString("1)Type"), "payment_card"))
-                        i = new Intent(mActivity, AddPaymentCardActivity.class);
-                    else
-                        i = new Intent(mActivity, AddPasswordActivity.class);
-                    String id_edit = document.getId();
-                    i.putExtra("documentId", id_edit);
-                    mActivity.startActivity(i);
-                } else if (item.getItemId() == R.id.delete) {
-                    int position = viewHolder.getAdapterPosition();
-                    String id = document.getId();
-                    String type = document.getString("1)Type");
-                    if (mAuth.getCurrentUser() != null && type != null)
-                        FirebaseFirestore.getInstance().collection("users")
-                                .document(mAuth.getCurrentUser().getUid())
-                                .collection(type).document(id).delete();
-                    mData.remove(position);
-                    notifyItemRemoved(position);
-                } else if (item.getItemId() == R.id.view) {
-                    String type = document.getString("1)Type");
-                    DialogView dialog;
-                    if (Objects.equals(type, "payment_card")){
-                        dialog = new DialogView(mActivity, document.getString("3)Name"),
-                                document.getString("6)Number"));
-                    } else {
-                        dialog = new DialogView(mActivity, document.getString("3)Name"),
-                                document.getString("6)Password"));
-                    }
-                    dialog.show();
-
-                }
-                return true;
-            });
-            popupMenu.show();
-            return true;
+            CustomBottomSheetDialogFragment bottomSheetDialogFragment = new CustomBottomSheetDialogFragment(document, viewHolder.getAdapterPosition(), this);
+            Bundle args = new Bundle();
+            args.putInt("position", viewHolder.getAdapterPosition());
+            bottomSheetDialogFragment.setArguments(args);
+            bottomSheetDialogFragment.show(mActivity.getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
         });
         return viewHolder;
     }
