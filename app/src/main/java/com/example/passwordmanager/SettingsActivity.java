@@ -9,38 +9,33 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
+    private AuthViewModel authViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        mAuth = FirebaseAuth.getInstance();
+        authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+
         ActionBar actionBar = getSupportActionBar();
         Objects.requireNonNull(actionBar).setHomeAsUpIndicator(R.drawable.arrow_back);
         Objects.requireNonNull(actionBar).setDisplayHomeAsUpEnabled(true);
 
         LinearLayout logout = findViewById(R.id.logout);
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseAuth.AuthStateListener authStateListener = firebaseAuth -> {
-            FirebaseUser user = mAuth.getCurrentUser();
-            if (user == null) {
-                Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        };
-        mAuth.addAuthStateListener(authStateListener);
-        logout.setOnClickListener(view -> mAuth.signOut());
+        logout.setOnClickListener(view -> {
+            authViewModel.logout();
+            Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        });
     }
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -51,4 +46,3 @@ public class SettingsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
-

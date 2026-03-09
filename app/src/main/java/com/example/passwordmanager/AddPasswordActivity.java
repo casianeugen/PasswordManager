@@ -2,7 +2,6 @@ package com.example.passwordmanager;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -12,34 +11,28 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 public class AddPasswordActivity extends AppCompatActivity {
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    FirebaseFirestore db1 = FirebaseFirestore.getInstance();
-    FirebaseUser user = mAuth.getCurrentUser();
-    Date date = new Date();
-    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+    private VaultItemEditorViewModel vaultItemEditorViewModel;
+    private VaultItemEntity existingItem;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        vaultItemEditorViewModel = new ViewModelProvider(this).get(VaultItemEditorViewModel.class);
+        if (vaultItemEditorViewModel.getCurrentUser() == null) {
+            openLogin();
+            return;
+        }
+
         setContentView(R.layout.activity_add_password);
 
         ActionBar actionBar = getSupportActionBar();
@@ -57,32 +50,23 @@ public class AddPasswordActivity extends AppCompatActivity {
         Button cancel_button = findViewById(R.id.cancel_button);
         Button add_button = findViewById(R.id.add_button);
 
-        Intent i = getIntent();
-
-        pass_pass.setText(i.getStringExtra("password"));
-        name_pass.setText(i.getStringExtra("documentId"));
-        if(Objects.requireNonNull(name_pass.getText()).toString().equals(i.getStringExtra("documentId"))){
+        Intent intent = getIntent();
+        pass_pass.setText(intent.getStringExtra("password"));
+        existingItem = vaultItemEditorViewModel.loadItem(intent.getStringExtra("documentId"),
+                VaultItemEntity.TYPE_PASSWORD);
+        if (existingItem != null) {
             add_button.setText(R.string.edit);
-            DocumentReference pass_edit = db1.collection("users").document(user.getUid())
-                    .collection("passwords").document(i.getStringExtra("documentId"));
-            pass_edit.get().addOnSuccessListener(documentSnapshot -> {
-                if(documentSnapshot.exists()){
-                    name_pass.setText(documentSnapshot.getString("3)Name"));
-                    url_pass.setText(documentSnapshot.getString("4)Url"));
-                    username_pass.setText(documentSnapshot.getString("5)Username"));
-                    pass_pass.setText(documentSnapshot.getString("6)Password"));
-                    notes_pass.setText(documentSnapshot.getString("7)Notes"));
-                    autofill.setChecked(Boolean.TRUE.equals(documentSnapshot.getBoolean("8)Autofill")));
-                    notification.setChecked(Boolean.TRUE.equals(documentSnapshot.getBoolean("9)Notification")));
-                }
-                else {
-                    Log.d("TAG", "No such document");
-                }
-            });
+            name_pass.setText(existingItem.name);
+            url_pass.setText(existingItem.url);
+            username_pass.setText(existingItem.username);
+            pass_pass.setText(existingItem.password);
+            notes_pass.setText(existingItem.notes);
+            autofill.setChecked(existingItem.autofillEnabled);
+            notification.setChecked(existingItem.notificationEnabled);
         }
 
-        notes_pass.setOnFocusChangeListener((view, b) -> {
-            if (b) {
+        notes_pass.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
                 notes_pass.setLines(4);
                 notes_pass.setGravity(Gravity.TOP);
             } else {
@@ -91,64 +75,46 @@ public class AddPasswordActivity extends AppCompatActivity {
             }
         });
 
-        name_pass.setOnFocusChangeListener((view, b) -> {
-            if (b)
+        name_pass.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
                 name.setErrorEnabled(false);
-        });
-
-        cancel_button.setOnClickListener(view -> {
-            Intent intent = new Intent(AddPasswordActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        add_button.setOnClickListener(view -> {
-            if (user != null) {
-                if (Objects.requireNonNull(name_pass.getText()).toString().isEmpty()) {
-                    name.setErrorEnabled(true);
-                    name.setError("You must enter a name");
-                } else {
-                    DocumentReference userDocRef = db1.collection("users").document(user.getUid());
-                    CollectionReference passwordColRef = userDocRef.collection("passwords");
-
-                    Map<String, Object> pass_info_map = new HashMap<>();
-                    pass_info_map.put("1)Type", "passwords");
-                    pass_info_map.put("2)Icon", R.drawable.ic_menu_password);
-                    pass_info_map.put("3)Name", name_pass.getText().toString());
-                    pass_info_map.put("4)Url", Objects.requireNonNull(url_pass.getText()).toString());
-                    pass_info_map.put("5)Username", Objects.requireNonNull(username_pass.getText()).toString());
-                    pass_info_map.put("6)Password", Objects.requireNonNull(pass_pass.getText()).toString());
-                    pass_info_map.put("7)Notes", Objects.requireNonNull(notes_pass.getText()).toString());
-                    if (autofill.isChecked())
-                        pass_info_map.put("8)Autofill", true);
-                    else
-                        pass_info_map.put("8)Autofill", false);
-                    if (notification.isChecked())
-                        pass_info_map.put("9)Notification", true);
-                    else
-                        pass_info_map.put("9)Notification", false);
-                    pass_info_map.put("10)UpdatedTime", formatter.format(date));
-                    if(add_button.getText().toString().equals("Edit"))
-                        passwordColRef.document(i.getStringExtra("documentId")).set(pass_info_map);
-                    else
-                        passwordColRef.document(random_id()).set(pass_info_map);
-                    startActivity(new Intent(AddPasswordActivity.this, MainActivity.class));
-                    finish();
-                }
-            } else {
-                Toast.makeText(this, "User is not logged in", Toast.LENGTH_SHORT).show();
             }
         });
+
+        cancel_button.setOnClickListener(view -> openMain());
+        add_button.setOnClickListener(view -> {
+            OperationResult<VaultItemEntity> result = vaultItemEditorViewModel.savePassword(existingItem,
+                    Objects.requireNonNull(name_pass.getText()).toString(),
+                    Objects.requireNonNull(url_pass.getText()).toString(),
+                    Objects.requireNonNull(username_pass.getText()).toString(),
+                    Objects.requireNonNull(pass_pass.getText()).toString(),
+                    Objects.requireNonNull(notes_pass.getText()).toString(),
+                    autofill.isChecked(),
+                    notification.isChecked());
+            if (!result.isSuccess()) {
+                name.setErrorEnabled(true);
+                name.setError(result.getMessage());
+                return;
+            }
+            openMain();
+        });
     }
+
+    private void openMain() {
+        startActivity(new Intent(AddPasswordActivity.this, MainActivity.class));
+        finish();
+    }
+
+    private void openLogin() {
+        startActivity(new Intent(AddPasswordActivity.this, LoginActivity.class));
+        finish();
+    }
+
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             this.finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-    public String random_id(){
-        SecureRandom random = new SecureRandom();
-        return String.valueOf(random.nextInt(1000));
     }
 }

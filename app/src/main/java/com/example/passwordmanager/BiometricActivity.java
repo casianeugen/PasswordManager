@@ -9,38 +9,44 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 public class BiometricActivity extends AppCompatActivity {
-    private FirebaseFirestore db;
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private AuthViewModel authViewModel;
+    private UserEntity currentUser;
 
-    protected void onCreate(Bundle savedInstanceState) {
+        protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+        currentUser = authViewModel.getCurrentUser();
+        if (currentUser == null) {
+            startActivity(new Intent(BiometricActivity.this, LoginActivity.class));
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_biometrics);
 
         MaterialButton bioLater = findViewById(R.id.bioLater);
         MaterialButton bioTurn = findViewById(R.id.bioTurn);
 
         bioLater.setOnClickListener(v -> {
-            db = FirebaseFirestore.getInstance();
-            updateBiometricEnrollmentFlag(Objects.requireNonNull(mAuth.getCurrentUser()).getUid(), false);
-            Intent intent = new Intent(BiometricActivity.this, LoginActivity.class);
-            startActivity(intent);
-            finish();
+            authViewModel.updateBiometricEnrollment(false);
+            openMain();
         });
 
         bioTurn.setOnClickListener(v -> {
-            db = FirebaseFirestore.getInstance();
-            showBiometricPrompt();
+            BiometricManager biometricManager = BiometricManager.from(this);
+            int canAuthenticate = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+            if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+                showBiometricPrompt();
+            } else {
+                authViewModel.updateBiometricEnrollment(false);
+                Toast.makeText(this, "Biometrics are not available on this device", Toast.LENGTH_SHORT).show();
+                openMain();
+            }
         });
     }
 
@@ -61,10 +67,8 @@ public class BiometricActivity extends AppCompatActivity {
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                updateBiometricEnrollmentFlag(Objects.requireNonNull(mAuth.getCurrentUser()).getUid(), true);
-                Intent intent = new Intent(BiometricActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
+                authViewModel.updateBiometricEnrollment(true);
+                openMain();
             }
 
             @Override
@@ -78,15 +82,9 @@ public class BiometricActivity extends AppCompatActivity {
         biometricPrompt.authenticate(promptInfo);
     }
 
-    private void updateBiometricEnrollmentFlag(String userId, boolean isEnrolled) {
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("biometricEnrolled", isEnrolled);
-
-        db.collection("users").document(userId)
-                .set(userData, SetOptions.merge())
-                .addOnSuccessListener(unused -> {
-
-                })
-                .addOnFailureListener(e -> Toast.makeText(BiometricActivity.this, "Register Error", Toast.LENGTH_SHORT).show());
+    private void openMain() {
+        Intent intent = new Intent(BiometricActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

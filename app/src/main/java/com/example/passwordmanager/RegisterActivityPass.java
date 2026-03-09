@@ -15,15 +15,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -34,6 +30,7 @@ public class RegisterActivityPass extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_passwords);
 
+        AuthViewModel authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
         TextInputLayout passConfirmLayout = findViewById(R.id.reg_pass_confirm_text);
         TextInputEditText reg_pass_confirm = findViewById(R.id.reg_pass_confirm);
         ProgressBar passStrength = findViewById(R.id.passwordStrengthBar);
@@ -68,71 +65,36 @@ public class RegisterActivityPass extends AppCompatActivity {
         reg_pass_confirm.setOnClickListener(v -> conditions.setVisibility(View.GONE));
         newPass.addTextChangedListener(new PasswordStrengthChecker(passStrength, this, newPass, passLower, passUpper, passLong, passNum));
         continueButton.setOnClickListener(v -> {
-            BiometricManager biometricManager = BiometricManager.from(this);
-            int canAuthenticate = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK);
-            if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
-                if (Objects.requireNonNull(newPass.getText()).toString().trim().length() < 8) {
-                    newPassColor.setErrorEnabled(true);
-                    newPassColor.setError("Your password is too short");
-                    newPassColor.setDefaultHintTextColor(ColorStateList.valueOf(Color.RED));
-                } else if (!Pattern
-                        .compile("(?=.*[A-Z])")
-                        .matcher(newPass.getText().toString().trim()).find()) {
-                    newPassColor.setErrorEnabled(true);
-                    newPassColor.setError("Your password must contain at least one uppercase letter");
-                    newPassColor.setDefaultHintTextColor(ColorStateList.valueOf(Color.RED));
-                } else if (!Pattern
-                        .compile("(?=.*[a-z])")
-                        .matcher(newPass.getText().toString().trim()).find()) {
-                    newPassColor.setErrorEnabled(true);
-                    newPassColor.setError("Your password must contain at least one lowercase letter");
-                    newPassColor.setDefaultHintTextColor(ColorStateList.valueOf(Color.RED));
-                } else if (!Pattern
-                        .compile("(?=.*\\d).*")
-                        .matcher(newPass.getText().toString().trim()).find()) {
-                    newPassColor.setErrorEnabled(true);
-                    newPassColor.setError("Your password must contain at least one number");
-                    newPassColor.setDefaultHintTextColor(ColorStateList.valueOf(Color.RED));
-                } else if (!newPass.getText().toString().equals(Objects.requireNonNull(reg_pass_confirm.getText()).toString())) {
+            Intent intent = getIntent();
+            String email = intent.getStringExtra("email");
+            String password = Objects.requireNonNull(newPass.getText()).toString();
+            String confirmation = Objects.requireNonNull(reg_pass_confirm.getText()).toString();
+            String hint = Objects.requireNonNull(pass_hint.getText()).toString().trim();
+            OperationResult<UserEntity> result = authViewModel.register(email, password,
+                    confirmation, hint);
+            if (!result.isSuccess()) {
+                String message = result.getMessage();
+                if ("The password does not match".equals(message)) {
                     passConfirmLayout.setErrorEnabled(true);
-                    passConfirmLayout.setError("The password does not match");
+                    passConfirmLayout.setError(message);
                     passConfirmLayout.setDefaultHintTextColor(ColorStateList.valueOf(Color.RED));
                 } else {
-                    Intent i = getIntent();
-                    String email = i.getStringExtra("email");
-                    String password = newPass.getText().toString();
-                    String hint = Objects.requireNonNull(pass_hint.getText()).toString().trim();
-
-                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                    FirebaseFirestore db1 = FirebaseFirestore.getInstance();
-
-                    mAuth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener(this, task -> {
-                                if (task.isSuccessful()) {
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    if (user != null) {
-                                        Map<String, Object> userMap = new HashMap<>();
-                                        userMap.put("password_hint", hint);
-                                        db1.collection("users").document(user.getUid())
-                                                .set(userMap)
-                                                .addOnSuccessListener(aVoid -> {
-                                                    Intent intent = new Intent(RegisterActivityPass.this, BiometricActivity.class);
-                                                    startActivity(intent);
-                                                    finish();
-                                                })
-                                                .addOnFailureListener(e -> Toast.makeText(this, "Error adding user", Toast.LENGTH_SHORT).show());
-                                    } else {
-                                        Toast.makeText(this, "User is not logged in", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
+                    newPassColor.setErrorEnabled(true);
+                    newPassColor.setError(message);
+                    newPassColor.setDefaultHintTextColor(ColorStateList.valueOf(Color.RED));
                 }
-            } else {
-                Intent intent = new Intent(RegisterActivityPass.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
+                return;
             }
 
+            if (result.getData() == null) {
+                Toast.makeText(this, "Account already exists", Toast.LENGTH_SHORT).show();
+            } else {
+                BiometricManager biometricManager = BiometricManager.from(this);
+                int canAuthenticate = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+                Class<?> destination = canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS ? BiometricActivity.class : MainActivity.class;
+                startActivity(new Intent(RegisterActivityPass.this, destination));
+                finish();
+            }
         });
     }
 }

@@ -21,14 +21,9 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
     private AppBarConfiguration mAppBarConfiguration;
-    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     DrawerLayout drawer;
     NavigationView navigationView;
     View headerView;
@@ -38,10 +33,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     FloatingActionButton fab;
     Toolbar toolbar;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        LocalRepository repository = LocalRepository.getInstance(this);
+        UserEntity currentUser = repository.getCurrentUser();
+        if (currentUser == null) {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_main);
 
         fab = findViewById(R.id.fab);
@@ -50,15 +57,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.nav_view);
         headerView = navigationView.getHeaderView(0);
         profile_email = headerView.findViewById(R.id.profile_email);
-
         Button nav_settings = findViewById(R.id.nav_settings);
 
         setSupportActionBar(toolbar);
-
         navigationView.setNavigationItemSelectedListener(this);
-
-        profile_email.setText(Objects.requireNonNull(mAuth.getCurrentUser()).getEmail());
-
+        profile_email.setText(currentUser.email);
         fab.setOnClickListener(view -> addItemToList());
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -70,10 +73,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        nav_settings.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(intent);
-        });
+        nav_settings.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
     }
 
     @Override
@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.nav_about) {
-            // Show the About dialog
             AboutFragment dialog = new AboutFragment();
             dialog.show(getSupportFragmentManager(), "AboutFragment");
         }
@@ -106,29 +105,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search_menu, menu);
-
         searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchItem.getActionView();
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Handle search query submission here
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // Handle search query text change here
                 return false;
             }
         });
-
         return true;
     }
 
     private void addItemToList() {
-        Intent intent = new Intent(MainActivity.this, AddMenuActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(MainActivity.this, AddMenuActivity.class));
     }
 }
