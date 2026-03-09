@@ -9,15 +9,19 @@ import android.service.autofill.FillContext;
 import android.service.autofill.FillRequest;
 import android.service.autofill.FillResponse;
 import android.service.autofill.SaveCallback;
+import android.service.autofill.SaveInfo;
 import android.service.autofill.SaveRequest;
 import android.text.InputType;
+import android.util.Pair;
 import android.view.View;
+import android.view.ViewStructure;
 import android.view.autofill.AutofillId;
 import android.view.autofill.AutofillValue;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,26 +34,33 @@ public class PasswordAutofillService extends AutofillService {
             return;
         }
 
-        FillContext fillContext = request.getFillContexts()
-                .get(request.getFillContexts().size() - 1);
-        ParsedAutofillFields parsedFields = parseFields(fillContext.getStructure());
-        if (parsedFields.usernameId == null && parsedFields.passwordId == null) {
+        if (request.getFillContexts().isEmpty()) {
             callback.onSuccess(null);
             return;
         }
 
-        List<VaultItemEntity> items = LocalRepository.getInstance(this).getPasswordItemsForCurrentUser();
+        FillContext fillContext = request.getFillContexts()
+                .get(request.getFillContexts().size() - 1);
+        ParsedAutofillFields parsedFields = parseFields(fillContext.getStructure());
+        if (!parsedFields.hasCredentialTarget()) {
+            callback.onSuccess(null);
+            return;
+        }
+
+        List<VaultItemEntity> items = LocalRepository.getInstance(this).getPasswordItemsForAutofill();
+        List<VaultItemEntity> autofillItems = filterAutofillItems(items);
+        if (autofillItems.isEmpty()) {
+            callback.onSuccess(null);
+            return;
+        }
+
         FillResponse.Builder responseBuilder = new FillResponse.Builder();
         boolean hasDatasets = false;
 
-        for (VaultItemEntity item : items) {
-            if (!item.autofillEnabled) {
-                continue;
-            }
-
+        for (VaultItemEntity item : autofillItems) {
             RemoteViews presentation = new RemoteViews(getPackageName(),
                     android.R.layout.simple_list_item_1);
-            presentation.setTextViewText(android.R.id.text1, item.name);
+            presentation.setTextViewText(android.R.id.text1, buildDatasetTitle(item));
 
             Dataset.Builder datasetBuilder = new Dataset.Builder(presentation);
             boolean hasValue = false;
@@ -72,6 +83,13 @@ public class PasswordAutofillService extends AutofillService {
             }
         }
 
+        if (hasDatasets) {
+            SaveInfo saveInfo = buildSaveInfo(parsedFields);
+            if (saveInfo != null) {
+                responseBuilder.setSaveInfo(saveInfo);
+            }
+        }
+
         callback.onSuccess(hasDatasets ? responseBuilder.build() : null);
     }
 
@@ -86,6 +104,7 @@ public class PasswordAutofillService extends AutofillService {
             AssistStructure.ViewNode root = structure.getWindowNodeAt(windowIndex).getRootViewNode();
             traverseNode(root, fields);
         }
+        fields.finalizeCandidates();
         return fields;
     }
 
@@ -94,11 +113,23 @@ public class PasswordAutofillService extends AutofillService {
             return;
         }
 
+        AutofillId autofillId = node.getAutofillId();
+        boolean isEditableTextField = isEditableTextField(node);
+
+        if (isEditableTextField && fields.focusedId == null && node.isFocused()) {
+            fields.focusedId = autofillId;
+            fields.focusedPassword = isPasswordField(node);
+        }
+
+        if (isEditableTextField && !isPasswordField(node) && fields.firstTextFieldId == null) {
+            fields.firstTextFieldId = autofillId;
+        }
+
         if (fields.usernameId == null && isUsernameField(node)) {
-            fields.usernameId = node.getAutofillId();
+            fields.usernameId = autofillId;
         }
         if (fields.passwordId == null && isPasswordField(node)) {
-            fields.passwordId = node.getAutofillId();
+            fields.passwordId = autofillId;
         }
 
         for (int childIndex = 0; childIndex < node.getChildCount(); childIndex++) {
@@ -107,12 +138,23 @@ public class PasswordAutofillService extends AutofillService {
     }
 
     private boolean isUsernameField(AssistStructure.ViewNode node) {
-        return matchesHint(node, "username", "email", View.AUTOFILL_HINT_USERNAME,
-                View.AUTOFILL_HINT_EMAIL_ADDRESS);
+        if (matchesNodeMetadata(node, "username", "email", "login", "user", "account",
+                "identifier", "phone", View.AUTOFILL_HINT_USERNAME,
+                View.AUTOFILL_HINT_EMAIL_ADDRESS)) {
+            return true;
+        }
+
+        int inputType = node.getInputType();
+        int inputClass = inputType & InputType.TYPE_MASK_CLASS;
+        return isEditableTextField(node)
+                && inputClass == InputType.TYPE_CLASS_TEXT
+                && (inputType & InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
+                == InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
     }
 
     private boolean isPasswordField(AssistStructure.ViewNode node) {
-        if (matchesHint(node, "password", View.AUTOFILL_HINT_PASSWORD)) {
+        if (matchesNodeMetadata(node, "password", "passcode", "pin", "pwd",
+                View.AUTOFILL_HINT_PASSWORD)) {
             return true;
         }
 
@@ -120,31 +162,108 @@ public class PasswordAutofillService extends AutofillService {
         int variation = inputType & InputType.TYPE_MASK_VARIATION;
         return variation == InputType.TYPE_TEXT_VARIATION_PASSWORD
                 || variation == InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
+                || variation == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
                 || variation == InputType.TYPE_NUMBER_VARIATION_PASSWORD;
     }
 
-    private boolean matchesHint(AssistStructure.ViewNode node, String... values) {
+    private boolean isEditableTextField(AssistStructure.ViewNode node) {
+        if (node.getAutofillId() == null) {
+            return false;
+        }
+
+        int inputType = node.getInputType();
+        int inputClass = inputType & InputType.TYPE_MASK_CLASS;
+        if (inputClass == InputType.TYPE_CLASS_TEXT || inputClass == InputType.TYPE_CLASS_NUMBER) {
+            return true;
+        }
+
+        CharSequence className = node.getClassName();
+        return className != null
+                && className.toString().toLowerCase(Locale.US).contains("edittext");
+    }
+
+    private boolean matchesNodeMetadata(AssistStructure.ViewNode node, String... values) {
         for (String value : values) {
             String lowerCaseValue = value.toLowerCase(Locale.US);
             if (containsIgnoreCase(node.getIdEntry(), lowerCaseValue)
-                    || containsIgnoreCase(node.getHint(), lowerCaseValue)) {
+                    || containsIgnoreCase(node.getHint(), lowerCaseValue)
+                    || containsIgnoreCase(node.getText(), lowerCaseValue)
+                    || containsIgnoreCase(node.getWebDomain(), lowerCaseValue)
+                    || matchesHtmlInfo(node, lowerCaseValue)) {
                 return true;
             }
         }
 
         String[] autofillHints = node.getAutofillHints();
-        if (autofillHints == null) {
-            return false;
-        }
-
-        for (String autofillHint : autofillHints) {
-            for (String value : values) {
-                if (value.equalsIgnoreCase(autofillHint)) {
-                    return true;
+        if (autofillHints != null) {
+            for (String autofillHint : autofillHints) {
+                for (String value : values) {
+                    if (value.equalsIgnoreCase(autofillHint)) {
+                        return true;
+                    }
                 }
             }
         }
+
         return false;
+    }
+
+    private boolean matchesHtmlInfo(AssistStructure.ViewNode node, String expectedPart) {
+        ViewStructure.HtmlInfo htmlInfo = node.getHtmlInfo();
+        if (htmlInfo == null || htmlInfo.getAttributes() == null) {
+            return false;
+        }
+
+        for (Pair<String, String> attribute : htmlInfo.getAttributes()) {
+            if (containsIgnoreCase(attribute.first, expectedPart)
+                    || containsIgnoreCase(attribute.second, expectedPart)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<VaultItemEntity> filterAutofillItems(List<VaultItemEntity> items) {
+        List<VaultItemEntity> enabledItems = new ArrayList<>();
+        for (VaultItemEntity item : items) {
+            if (item.autofillEnabled) {
+                enabledItems.add(item);
+            }
+        }
+
+        if (!enabledItems.isEmpty()) {
+            return enabledItems;
+        }
+        return items;
+    }
+
+    private String buildDatasetTitle(VaultItemEntity item) {
+        if (item.username == null || item.username.trim().isEmpty()) {
+            return item.name;
+        }
+        return item.name + " (" + item.username + ")";
+    }
+
+    private SaveInfo buildSaveInfo(ParsedAutofillFields fields) {
+        List<AutofillId> ids = new ArrayList<>();
+        if (fields.usernameId != null) {
+            ids.add(fields.usernameId);
+        }
+        if (fields.passwordId != null) {
+            ids.add(fields.passwordId);
+        }
+        if (ids.isEmpty()) {
+            return null;
+        }
+
+        int dataType = 0;
+        if (fields.usernameId != null) {
+            dataType |= SaveInfo.SAVE_DATA_TYPE_USERNAME;
+        }
+        if (fields.passwordId != null) {
+            dataType |= SaveInfo.SAVE_DATA_TYPE_PASSWORD;
+        }
+        return new SaveInfo.Builder(dataType, ids.toArray(new AutofillId[0])).build();
     }
 
     private boolean containsIgnoreCase(CharSequence text, String expectedPart) {
@@ -154,5 +273,24 @@ public class PasswordAutofillService extends AutofillService {
     private static class ParsedAutofillFields {
         private AutofillId usernameId;
         private AutofillId passwordId;
+        private AutofillId focusedId;
+        private AutofillId firstTextFieldId;
+        private boolean focusedPassword;
+
+        private void finalizeCandidates() {
+            if (usernameId == null && firstTextFieldId != null && !firstTextFieldId.equals(passwordId)) {
+                usernameId = firstTextFieldId;
+            }
+
+            if (passwordId == null && focusedPassword) {
+                passwordId = focusedId;
+            } else if (usernameId == null && focusedId != null && !focusedPassword) {
+                usernameId = focusedId;
+            }
+        }
+
+        private boolean hasCredentialTarget() {
+            return usernameId != null || passwordId != null;
+        }
     }
 }
