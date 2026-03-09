@@ -47,14 +47,19 @@ public class PasswordAutofillService extends AutofillService {
             return;
         }
 
+        SaveInfo saveInfo = buildSaveInfo(parsedFields);
         List<VaultItemEntity> items = LocalRepository.getInstance(this).getPasswordItemsForAutofill();
         List<VaultItemEntity> autofillItems = filterAutofillItems(items);
+        FillResponse.Builder responseBuilder = new FillResponse.Builder();
+        if (saveInfo != null) {
+            responseBuilder.setSaveInfo(saveInfo);
+        }
+
         if (autofillItems.isEmpty()) {
-            callback.onSuccess(null);
+            callback.onSuccess(saveInfo == null ? null : responseBuilder.build());
             return;
         }
 
-        FillResponse.Builder responseBuilder = new FillResponse.Builder();
         boolean hasDatasets = false;
 
         for (VaultItemEntity item : autofillItems) {
@@ -83,23 +88,33 @@ public class PasswordAutofillService extends AutofillService {
             }
         }
 
-        if (hasDatasets) {
-            SaveInfo saveInfo = buildSaveInfo(parsedFields);
-            if (saveInfo != null) {
-                responseBuilder.setSaveInfo(saveInfo);
-            }
-        }
-
-        callback.onSuccess(hasDatasets ? responseBuilder.build() : null);
+        callback.onSuccess(hasDatasets || saveInfo != null ? responseBuilder.build() : null);
     }
 
     @Override
     public void onSaveRequest(@NonNull SaveRequest request, @NonNull SaveCallback callback) {
+        if (request.getFillContexts().isEmpty()) {
+            callback.onSuccess();
+            return;
+        }
+
+        FillContext fillContext = request.getFillContexts()
+                .get(request.getFillContexts().size() - 1);
+        ParsedAutofillFields parsedFields = parseFields(fillContext.getStructure());
+        LocalRepository.getInstance(this).saveAutofillCredential(
+                parsedFields.webDomain,
+                parsedFields.appPackage,
+                parsedFields.usernameValue,
+                parsedFields.passwordValue
+        );
         callback.onSuccess();
     }
 
     private ParsedAutofillFields parseFields(AssistStructure structure) {
         ParsedAutofillFields fields = new ParsedAutofillFields();
+        if (structure.getActivityComponent() != null) {
+            fields.appPackage = structure.getActivityComponent().getPackageName();
+        }
         for (int windowIndex = 0; windowIndex < structure.getWindowNodeCount(); windowIndex++) {
             AssistStructure.ViewNode root = structure.getWindowNodeAt(windowIndex).getRootViewNode();
             traverseNode(root, fields);
@@ -115,21 +130,31 @@ public class PasswordAutofillService extends AutofillService {
 
         AutofillId autofillId = node.getAutofillId();
         boolean isEditableTextField = isEditableTextField(node);
+        boolean passwordField = isPasswordField(node);
+        String nodeText = getNodeText(node);
+
+        if (fields.webDomain == null && node.getWebDomain() != null && !node.getWebDomain().trim().isEmpty()) {
+            fields.webDomain = node.getWebDomain().trim();
+        }
 
         if (isEditableTextField && fields.focusedId == null && node.isFocused()) {
             fields.focusedId = autofillId;
-            fields.focusedPassword = isPasswordField(node);
+            fields.focusedPassword = passwordField;
+            fields.focusedValue = nodeText;
         }
 
-        if (isEditableTextField && !isPasswordField(node) && fields.firstTextFieldId == null) {
+        if (isEditableTextField && !passwordField && fields.firstTextFieldId == null) {
             fields.firstTextFieldId = autofillId;
+            fields.firstTextFieldValue = nodeText;
         }
 
         if (fields.usernameId == null && isUsernameField(node)) {
             fields.usernameId = autofillId;
+            fields.usernameValue = nodeText;
         }
-        if (fields.passwordId == null && isPasswordField(node)) {
+        if (fields.passwordId == null && passwordField) {
             fields.passwordId = autofillId;
+            fields.passwordValue = nodeText;
         }
 
         for (int childIndex = 0; childIndex < node.getChildCount(); childIndex++) {
@@ -263,11 +288,24 @@ public class PasswordAutofillService extends AutofillService {
         if (fields.passwordId != null) {
             dataType |= SaveInfo.SAVE_DATA_TYPE_PASSWORD;
         }
-        return new SaveInfo.Builder(dataType, ids.toArray(new AutofillId[0])).build();
+        return new SaveInfo.Builder(dataType, ids.toArray(new AutofillId[0]))
+                .setFlags(SaveInfo.FLAG_SAVE_ON_ALL_VIEWS_INVISIBLE)
+                .build();
     }
 
     private boolean containsIgnoreCase(CharSequence text, String expectedPart) {
         return text != null && text.toString().toLowerCase(Locale.US).contains(expectedPart);
+    }
+
+    private String getNodeText(AssistStructure.ViewNode node) {
+        AutofillValue autofillValue = node.getAutofillValue();
+        if (autofillValue != null && autofillValue.isText() && autofillValue.getTextValue() != null) {
+            return autofillValue.getTextValue().toString();
+        }
+        if (node.getText() != null) {
+            return node.getText().toString();
+        }
+        return null;
     }
 
     private static class ParsedAutofillFields {
@@ -276,16 +314,25 @@ public class PasswordAutofillService extends AutofillService {
         private AutofillId focusedId;
         private AutofillId firstTextFieldId;
         private boolean focusedPassword;
+        private String usernameValue;
+        private String passwordValue;
+        private String focusedValue;
+        private String firstTextFieldValue;
+        private String webDomain;
+        private String appPackage;
 
         private void finalizeCandidates() {
             if (usernameId == null && firstTextFieldId != null && !firstTextFieldId.equals(passwordId)) {
                 usernameId = firstTextFieldId;
+                usernameValue = firstTextFieldValue;
             }
 
             if (passwordId == null && focusedPassword) {
                 passwordId = focusedId;
+                passwordValue = focusedValue;
             } else if (usernameId == null && focusedId != null && !focusedPassword) {
                 usernameId = focusedId;
+                usernameValue = focusedValue;
             }
         }
 
